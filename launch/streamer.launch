@@ -1,0 +1,9 @@
+<launch>
+
+  <!-- Launching nodes for streaming to iPhone -->
+  <node name="control_streamer" pkg="ros_roar_streamer" type="control_streamer.py" args=""></node>
+  <node name="state_streamer" pkg="ros_roar_streamer" type="state_streamer.py" args=""></node>
+  <node name="rgb_streamer" pkg="ros_roar_streamer" type="rgb_streamer.py" args=""></node>
+  <node name="depth_streamer" pkg="ros_roar_streamer" type="depth_streamer.py" args=""></node>
+	
+</launch>
