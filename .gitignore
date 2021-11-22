@@ -44,6 +44,9 @@ qtcreator-*
 
 *~
 
+# VSCode Stuff
+*.vscode
+
 # Emacs
 .#*
 
