@@ -14,7 +14,6 @@
     </li>
     <li><a href="#Usage">Usage</a></li>
     <li><a href="#contact">Contact</a></li>
-    <li><a href="#Acknowledgements-and-references">Acknowledgements and References</a></li>
   </ol>
 </details>
 
@@ -33,22 +32,43 @@ To get a local copy up and running follow these simple steps.
 
 ### Prerequisites
 
-TO DO
+It is assumed that your system(s) is running Ubuntu 18.04/20.04 and has a working installation of ROS1 (Melodic or later). This repo has not been tested on other linux distributions.
+
+Please follow instructions on how to install [ROS Melodic](http://wiki.ros.org/melodic/Installation/Ubuntu) if you are using Ubuntu 18.04, or [ROS Noetic](http://wiki.ros.org/noetic/Installation/Ubuntu) if you are using Ubuntu 20.04. The desktop-full version needs to be installed.
+
+
 
 ### Installation
 
-<!-- 1. Clone the repository and its dependencies
-   ```bash
-   git clone https://github.com/amansrf/cs294-137-hw2-amansrf.git
-   ```
-3. Download the SimEnvironments package from here: https://drive.google.com/file/d/13Xf_rKldxM0mgLmgZgbKe2Dg_VzIJBgL/view?usp=sharing
+1. Make a ROS workspace if not done already.
+    ```bash
+    mkdir -p ~/catkin_ws/src
+    cd ~/catkin_ws/src
+    ```
 
-4. Open project folder in Unity to allow Unity to build.
-
-5. Once built, load SampleScene from the Scenes folder.
-
-6. Run the game and enjoy! -->
-TO DO
+2. Clone the repository and its dependencies
+    ```bash
+    git clone https://github.com/amansrf/ros_roar_streamer.git
+    ```
+3. Install required ROS packages
+    ```bash
+    cd ~/catkin_ws
+    sudo apt-get update
+    sudo rosdep init
+    rosdep update
+    rosdep install --from-paths src --ignore-src --rosdistro=${ROS_DISTRO} -y
+    ```
+4. Create a virtual environment and install python packages 
+    ```bash
+    virtualenv venv -p python3
+    source ~/catkin_ws/venv/bin/activate
+    pip install -r ~/catkin_ws/src/ros_roar_streamer/${ROS_DISTRO}_requirements.txt
+    ```
+5. Build all the packages and source the workspace
+    ```bash
+    catkin_make
+    source ~/catkin_ws/devel/setup.bash
+    ```
 
 <!-- LICENSE -->
 <!-- ## License
@@ -57,16 +77,26 @@ Distributed under the MIT License. See `LICENSE` for more information. -->
 <!-- USAGE -->
 ## USAGE
 
-<!-- Watch a video walkthrough of the game here: https://youtu.be/mrbI14FGsqc -->
-TO DO
+Calibrate the iPhone and change the IP Address in 
+~/catkin_ws/src/ros_roar_streamer/config.py to match what is shown in the app
+
+Then launch the various ROS Nodes using:
+
+```bash
+roslaunch ros_roar_streamer streamer.launch
+```
+
+You should see a depth image stream and an rgb image stream on your screen!
 
 <!-- CONTACT -->
 ## Contact
+If you have any issues or find any bugs please feel free to contact:
 
 Aman Saraf     - amansaraf99@gmail.com, aman_saraf@berkeley.edu
+Sunisha Fernandez - sunisha.fernandez@gmail.com, sunisha.fernandez@berkeley.edu 
 
 
 <!-- ACKNOWLEDGEMENTS -->
-## Acknowledgements and References
+<!-- ## Acknowledgements and References
 
-TO DO
+TO DO -->
