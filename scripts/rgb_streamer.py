@@ -2,6 +2,7 @@
 
 import rospy
 from sensor_msgs.msg import Image
+from sensor_msgs.msg import CameraInfo
 from cv_bridge import CvBridge
 
 from typing import List, Optional, Tuple, List
@@ -62,7 +63,8 @@ def RGBStreamer():
                                      update_interval=0.025,
                                      threaded=True)
 
-    pub = rospy.Publisher('rgb_image', Image, queue_size=10)
+    RGB_image_pub = rospy.Publisher('rgb_image', Image, queue_size=10)
+    rgb_info_pub = rospy.Publisher('rgb_img_info', CameraInfo, queue_size=10)
     rospy.init_node('rgb_streamer', anonymous=False)
 
     rate = rospy.Rate(PUB_RATE) # in Hz
@@ -75,9 +77,26 @@ def RGBStreamer():
             cv2.imshow("img", img)
             cv2.waitKey(1)
 
-            rgb_img_msg = bridge.cv2_to_imgmsg(img, encoding="passthrough")
+            rgb_info_msg = CameraInfo()
+            rgb_info_msg.header.frame_id = 'base_link'
+            # rgb_info_msg.header.seq = np.random.randint(0,10000000)
+            rgb_info_msg.height = 256
+            rgb_info_msg.width = 144
+            rgb_info_msg.distortion_model = 'plumb_bob'
+            fx = ir_image_server.intrinsics[0,0]
+            fy = ir_image_server.intrinsics[1,1]
+            cx = ir_image_server.intrinsics[0,2]
+            cy = ir_image_server.intrinsics[1,2]
+            print(cx, cy)
+            rgb_info_msg.K = [fx, 0, cx, 0, fy, cy, 0, 0, 1]
+            rgb_info_msg.D = [0, 0, 0, 0, 0]
+            rgb_info_msg.R = [1.0, 0, 0, 0, 1.0, 0, 0, 0, 1.0]
+            rgb_info_msg.P = [fx, 0, cx, 0, 0, fy, cy, 0, 0, 0, 1.0, 0]
+
+            rgb_img_msg = bridge.cv2_to_imgmsg(img, encoding="bgr8")
             rgb_img_msg.header.stamp = rospy.Time.now()
-            pub.publish(rgb_img_msg)
+            RGB_image_pub.publish(rgb_img_msg)
+            rgb_info_pub.publish(rgb_info_msg)
 
         rate.sleep()
 
