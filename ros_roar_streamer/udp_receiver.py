@@ -6,7 +6,7 @@ import time
 from typing import Optional
 
 sys.path.append(Path(os.getcwd()).parent.as_posix())
-from module import Module
+from . module import Module
 from collections import defaultdict
 
 MAX_DGRAM = 9620

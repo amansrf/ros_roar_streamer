@@ -1,21 +1,25 @@
 #!/usr/bin/env python3
 
-import rospy
+import rclpy
+from rclpy.node import Node
+
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import Imu
-from tf.transformations import quaternion_from_euler
+from tf_transformations import quaternion_from_euler
 from geometry_msgs.msg import Quaternion
 from geometry_msgs.msg import Vector3
+
+from std_msgs.msg import String
 
 import numpy as np
 import sys, os
 from pathlib import Path
 import time
-import config as cfg
+from . import config as cfg
 
 sys.path.append(Path(os.getcwd()).parent.as_posix())
-from udp_receiver import UDPStreamer
-from data_structures_models import Transform, Vector3D
+from . udp_receiver import UDPStreamer
+from . data_structures_models import Transform, Vector3D
 
 G = cfg.config["G"]
 ip = cfg.config["ip_address"]
@@ -55,63 +59,86 @@ class VehicleStateStreamer(UDPStreamer):
         except Exception as e:
             self.logger.error(e)
 
+class StateStreamer(Node):
 
-def StateStreamer():
-    streamer = VehicleStateStreamer(ios_address=ip,
+    def __init__(self):
+        super().__init__('state_streamer')
+        self.streamer = VehicleStateStreamer(ios_address=ip,
                                     port=8003,
                                     name="VehicleStateStreamer",
                                     update_interval=0.025,
                                     threaded=True)
+        self.imu_pub = self.create_publisher(Imu, 'iPhone_imu', 10)
+        self.odom_pub = self.create_publisher(Odometry, 'iPhone_odom', 10)
 
-    imu_pub = rospy.Publisher('iPhone_imu', Imu, queue_size=10)
-    odom_pub = rospy.Publisher('iPhone_odom', Odometry, queue_size=10)
-    rospy.init_node('state_streamer', anonymous=False)
-    
-    rate = rospy.Rate(PUB_RATE) # in Hz
+        timer_period = cfg.config["query_rate"]  # seconds
+        self.timer = self.create_timer(timer_period, self.timer_callback)
 
-    while not rospy.is_shutdown():
+    def timer_callback(self):
+        streamer = self.streamer
         streamer.run_in_series()
-        # print(streamer.transform, streamer.velocity)
+
+        ### DEBUG ONLY
+        print(self.streamer.transform, streamer.velocity)
 
         q = quaternion_from_euler(streamer.transform.rotation.roll, 
                               streamer.transform.rotation.pitch,
                               streamer.transform.rotation.yaw)
-
+        
         ### Constructing Imu Message
         imu_msg = Imu()
         imu_msg.header.frame_id = 'base_link'
-        imu_msg.header.stamp = rospy.Time.now()
-        imu_msg.orientation = Quaternion(*q)
-        imu_msg.orientation_covariance = [-1,0,0,0,0,0,0,0,0]
-        imu_msg.angular_velocity.x = streamer.gyro.x
-        imu_msg.angular_velocity.y = streamer.gyro.y
-        imu_msg.angular_velocity.z = streamer.gyro.z
+        imu_msg.header.stamp = self.get_clock().now().to_msg()
+        # imu_msg.orientation = Quaternion(q[0], q[1], q[2], q[3])
+        imu_msg.orientation = Quaternion()
+        imu_msg.orientation.x = q[0]
+        imu_msg.orientation.y = q[1]
+        imu_msg.orientation.z = q[2]
+        imu_msg.orientation.w = q[3]
+        imu_msg.orientation_covariance = [-1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+        imu_msg.angular_velocity.x = float(streamer.gyro.x)
+        imu_msg.angular_velocity.y = float(streamer.gyro.y)
+        imu_msg.angular_velocity.z = float(streamer.gyro.z)
         imu_msg.linear_acceleration.x = G*streamer.acceleration.x
         imu_msg.linear_acceleration.y = G*streamer.acceleration.y
         imu_msg.linear_acceleration.z = G*streamer.acceleration.z
+        
         ### Constructing Odom Message
         odom_msg = Odometry()
         odom_msg.header.frame_id = 'odom'
         odom_msg.child_frame_id = 'base_link'
-        odom_msg.header.stamp = rospy.Time.now()
+        odom_msg.header.stamp = self.get_clock().now().to_msg()
         odom_msg.pose.pose.position.x = streamer.transform.location.x
         odom_msg.pose.pose.position.y = streamer.transform.location.y
         odom_msg.pose.pose.position.z = streamer.transform.location.z
-        odom_msg.pose.pose.orientation = Quaternion(*q)
-        odom_msg.twist.twist.linear.x = streamer.velocity.x
-        odom_msg.twist.twist.linear.y = streamer.velocity.y
-        odom_msg.twist.twist.linear.z = streamer.velocity.z
-        odom_msg.twist.twist.angular.x = streamer.gyro.x
-        odom_msg.twist.twist.angular.y = streamer.gyro.y
-        odom_msg.twist.twist.angular.z = streamer.gyro.z
+        odom_msg.pose.pose.orientation = Quaternion()
+        odom_msg.pose.pose.orientation.x = q[0]
+        odom_msg.pose.pose.orientation.y = q[1]
+        odom_msg.pose.pose.orientation.z = q[2]
+        odom_msg.pose.pose.orientation.w = q[3]
+        odom_msg.twist.twist.linear.x = float(streamer.velocity.x)
+        odom_msg.twist.twist.linear.y = float(streamer.velocity.y)
+        odom_msg.twist.twist.linear.z = float(streamer.velocity.z)
+        odom_msg.twist.twist.angular.x = float(streamer.gyro.x)
+        odom_msg.twist.twist.angular.y = float(streamer.gyro.y)
+        odom_msg.twist.twist.angular.z = float(streamer.gyro.z)
 
-        imu_pub.publish(imu_msg)
-        odom_pub.publish(odom_msg)
-        rate.sleep()
+        self.imu_pub.publish(imu_msg)
+        self.odom_pub.publish(odom_msg)
+
+        # self.get_logger().info('Publishing odom: "%s"' % odom_msg)
+        # self.get_logger().info('Publishing imu: "%s"' % imu_msg)
+
+def main(args=None):
+    rclpy.init(args=args)
+
+    state_streamer = StateStreamer()
+
+    rclpy.spin(state_streamer)
+
+    state_streamer.destroy_node()
+    rclpy.shutdown()
+
 
 if __name__ == '__main__':
-    try:
-        StateStreamer()
-    except rospy.ROSInterruptException:
-        pass
-
+    main()

@@ -3,7 +3,7 @@ import numpy as np
 from scipy.spatial import distance
 from typing import Union, Optional
 from typing import List
-from utilities import rotation_matrix_from_euler
+from . utilities import rotation_matrix_from_euler
 
 
 class Location(BaseModel):

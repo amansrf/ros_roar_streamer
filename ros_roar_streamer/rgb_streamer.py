@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
-import rospy
+import rclpy
+from rclpy.node import Node
+
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import CameraInfo
 from cv_bridge import CvBridge
@@ -12,8 +14,8 @@ import sys, os
 from pathlib import Path
 
 sys.path.append(Path(os.getcwd()).parent.as_posix())
-from udp_receiver import UDPStreamer
-import config as cfg
+from . udp_receiver import UDPStreamer
+from . import config as cfg
 import struct
 import time
 
@@ -56,20 +58,23 @@ class RGBCamStreamer(UDPStreamer):
             self.logger.error(e)
 
 
-def RGBStreamer():
-    ir_image_server = RGBCamStreamer(ios_address=ip,
+class RGBStreamer(Node):
+
+    def __init__(self):
+        super().__init__('rgb_streamer')
+        self.ir_image_server = RGBCamStreamer(ios_address=ip,
                                      pc_port=8001,
                                      name="world_rgb_streamer",
                                      update_interval=0.025,
                                      threaded=True)
+        self.rgb_image_pub = self.create_publisher(Image, 'rgb_image', 10)
+        self.rgb_info_pub = self.create_publisher(CameraInfo, 'rgb_img_info', 10)
 
-    RGB_image_pub = rospy.Publisher('rgb_image', Image, queue_size=10)
-    rgb_info_pub = rospy.Publisher('rgb_img_info', CameraInfo, queue_size=10)
-    rospy.init_node('rgb_streamer', anonymous=False)
+        timer_period = cfg.config["query_rate"]  # seconds
+        self.timer = self.create_timer(timer_period, self.timer_callback)
 
-    rate = rospy.Rate(PUB_RATE) # in Hz
-
-    while not rospy.is_shutdown():
+    def timer_callback(self):
+        ir_image_server = self.ir_image_server
         ir_image_server.run_in_series()
         if ir_image_server.curr_image is not None:
             img = ir_image_server.curr_image
@@ -83,25 +88,31 @@ def RGBStreamer():
             rgb_info_msg.height = 256
             rgb_info_msg.width = 144
             rgb_info_msg.distortion_model = 'plumb_bob'
-            fx = ir_image_server.intrinsics[0,0]
-            fy = ir_image_server.intrinsics[1,1]
-            cx = ir_image_server.intrinsics[0,2]
-            cy = ir_image_server.intrinsics[1,2]
-            print(cx, cy)
-            rgb_info_msg.K = [fx, 0, cx, 0, fy, cy, 0, 0, 1]
-            rgb_info_msg.D = [0, 0, 0, 0, 0]
-            rgb_info_msg.R = [1.0, 0, 0, 0, 1.0, 0, 0, 0, 1.0]
-            rgb_info_msg.P = [fx, 0, cx, 0, 0, fy, cy, 0, 0, 0, 1.0, 0]
+            fx = float(ir_image_server.intrinsics[0,0])
+            fy = float(ir_image_server.intrinsics[1,1])
+            cx = float(ir_image_server.intrinsics[0,2])
+            cy = float(ir_image_server.intrinsics[1,2])
+            # print(cx, cy)
+            rgb_info_msg.k = [fx, 0.0, cx, 0.0, fy, cy, 0.0, 0.0, 1.0]
+            rgb_info_msg.d = [0.0, 0.0, 0.0, 0.0, 0.0]
+            rgb_info_msg.r = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0]
+            rgb_info_msg.p = [fx, 0.0, cx, 0.0, 0.0, fy, cy, 0.0, 0.0, 0.0, 1.0, 0.0]
 
             rgb_img_msg = bridge.cv2_to_imgmsg(img, encoding="bgr8")
-            rgb_img_msg.header.stamp = rospy.Time.now()
-            RGB_image_pub.publish(rgb_img_msg)
-            rgb_info_pub.publish(rgb_info_msg)
+            rgb_img_msg.header.stamp = self.get_clock().now().to_msg()
+            self.rgb_image_pub.publish(rgb_img_msg)
+            self.rgb_info_pub.publish(rgb_info_msg)
 
-        rate.sleep()
+def main(args=None):
+    rclpy.init(args=args)
+
+    rgb_streamer = RGBStreamer()
+
+    rclpy.spin(rgb_streamer)
+
+    rgb_streamer.destroy_node()
+    rclpy.shutdown()
+
 
 if __name__ == '__main__':
-    try:
-        RGBStreamer()
-    except rospy.ROSInterruptException:
-        pass
+    main()
