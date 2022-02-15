@@ -56,6 +56,10 @@ class VehicleStateStreamer(UDPStreamer):
             self.gyro.y = d[13]
             self.gyro.z = d[14]
 
+            self.hall_effect_velocity = d[15]
+
+            self.recv_time = d[16]
+
         except Exception as e:
             self.logger.error(e)
 

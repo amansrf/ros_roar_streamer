@@ -79,8 +79,8 @@ class RGBStreamer(Node):
         if ir_image_server.curr_image is not None:
             img = ir_image_server.curr_image
             img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
-            cv2.imshow("img", img)
-            cv2.waitKey(1)
+            # cv2.imshow("img", img)
+            # cv2.waitKey(1)
 
             rgb_info_msg = CameraInfo()
             rgb_info_msg.header.frame_id = 'base_link'

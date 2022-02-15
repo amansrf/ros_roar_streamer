@@ -13,7 +13,8 @@ import cv2
 import sys, os
 from pathlib import Path
 
-sys.path.append(Path(os.getcwd()).parent.as_posix())
+# sys.path.append(Path(os.getcwd()).parent.as_posix())
+# print(sys.path)
 from . udp_receiver import UDPStreamer
 from . import config as cfg
 import struct
@@ -49,11 +50,11 @@ class DepthCamStreamer(UDPStreamer):
             img = np.frombuffer(img_data, dtype=np.float32)
             if img is not None:
                 self.curr_image = np.rot90(img.reshape((144, 256)), k=-1)
-
         except OSError:
             self.should_continue_threaded = False
         except Exception as e:
             self.logger.error(e)
+            print(e)
 
 
 class DepthStreamer(Node):
@@ -76,8 +77,8 @@ class DepthStreamer(Node):
         ir_image_server.run_in_series()
         if ir_image_server.curr_image is not None:
             img = ir_image_server.curr_image
-            cv2.imshow("img", img)
-            cv2.waitKey(1)
+            # cv2.imshow("img", img)
+            # cv2.waitKey(1)
 
             depth_info_msg = CameraInfo()
             depth_info_msg.header.frame_id = 'base_link'
