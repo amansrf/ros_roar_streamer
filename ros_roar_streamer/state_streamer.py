@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
 
+
+from sympy import im
 import rclpy
 from rclpy.node import Node
 
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import Imu
 from tf_transformations import quaternion_from_euler
+from geometry_msgs.msg import TransformStamped
+from tf2_ros import TransformBroadcaster
+import tf_transformations
+
 from geometry_msgs.msg import Quaternion
 from geometry_msgs.msg import Vector3
 
@@ -32,6 +38,11 @@ class VehicleStateStreamer(UDPStreamer):
         self.velocity = Vector3D()
         self.acceleration = Vector3D()
         self.gyro = Vector3D()
+        
+        self.ix = 0
+        self.iy = 0 
+        self.iz = 0 
+        self.r = 0
 
     def run_in_series(self, **kwargs):
         try:
@@ -56,9 +67,14 @@ class VehicleStateStreamer(UDPStreamer):
             self.gyro.y = d[13]
             self.gyro.z = d[14]
 
-            self.hall_effect_velocity = d[15]
+            # self.hall_effect_velocity = d[15]
 
-            self.recv_time = d[16]
+            self.recv_time = d[15]
+
+            self.ix = d[16]
+            self.iy = d[17]
+            self.iz = d[18]
+            self.r = d[19]
 
         except Exception as e:
             self.logger.error(e)
@@ -74,6 +90,7 @@ class StateStreamer(Node):
                                     threaded=True)
         self.imu_pub = self.create_publisher(Imu, 'iPhone_imu', 10)
         self.odom_pub = self.create_publisher(Odometry, 'iPhone_odom', 10)
+        self.transform_br = TransformBroadcaster(self) 
 
         timer_period = cfg.config["query_rate"]  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
@@ -83,11 +100,9 @@ class StateStreamer(Node):
         streamer.run_in_series()
 
         ### DEBUG ONLY
-        print(self.streamer.transform, streamer.velocity)
-
-        q = quaternion_from_euler(streamer.transform.rotation.roll, 
-                              streamer.transform.rotation.pitch,
-                              streamer.transform.rotation.yaw)
+        # q = quaternion_from_euler(streamer.transform.rotation.roll, 
+        #                       streamer.transform.rotation.pitch,
+        #                       streamer.transform.rotation.yaw)
         
         ### Constructing Imu Message
         imu_msg = Imu()
@@ -95,10 +110,10 @@ class StateStreamer(Node):
         imu_msg.header.stamp = self.get_clock().now().to_msg()
         # imu_msg.orientation = Quaternion(q[0], q[1], q[2], q[3])
         imu_msg.orientation = Quaternion()
-        imu_msg.orientation.x = q[0]
-        imu_msg.orientation.y = q[1]
-        imu_msg.orientation.z = q[2]
-        imu_msg.orientation.w = q[3]
+        imu_msg.orientation.x = streamer.ix
+        imu_msg.orientation.y = streamer.iy
+        imu_msg.orientation.z = streamer.iz
+        imu_msg.orientation.w = streamer.r
         imu_msg.orientation_covariance = [-1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
         imu_msg.angular_velocity.x = float(streamer.gyro.x)
         imu_msg.angular_velocity.y = float(streamer.gyro.y)
@@ -116,10 +131,10 @@ class StateStreamer(Node):
         odom_msg.pose.pose.position.y = streamer.transform.location.y
         odom_msg.pose.pose.position.z = streamer.transform.location.z
         odom_msg.pose.pose.orientation = Quaternion()
-        odom_msg.pose.pose.orientation.x = q[0]
-        odom_msg.pose.pose.orientation.y = q[1]
-        odom_msg.pose.pose.orientation.z = q[2]
-        odom_msg.pose.pose.orientation.w = q[3]
+        odom_msg.pose.pose.orientation.x = streamer.ix
+        odom_msg.pose.pose.orientation.y = streamer.iy
+        odom_msg.pose.pose.orientation.z = streamer.iz
+        odom_msg.pose.pose.orientation.w = streamer.r
         odom_msg.twist.twist.linear.x = float(streamer.velocity.x)
         odom_msg.twist.twist.linear.y = float(streamer.velocity.y)
         odom_msg.twist.twist.linear.z = float(streamer.velocity.z)
@@ -127,6 +142,22 @@ class StateStreamer(Node):
         odom_msg.twist.twist.angular.y = float(streamer.gyro.y)
         odom_msg.twist.twist.angular.z = float(streamer.gyro.z)
 
+        ### construct transform information
+        t = TransformStamped()
+        t.header.stamp = self.get_clock().now().to_msg()
+        t.header.frame_id = "world"
+        t.child_frame_id = "iPhone"
+
+        t.transform.translation.x = streamer.transform.location.x
+        t.transform.translation.y = streamer.transform.location.y
+        t.transform.translation.z = streamer.transform.location.z
+
+        t.transform.rotation.x = streamer.ix
+        t.transform.rotation.y = streamer.iy
+        t.transform.rotation.z = streamer.iz
+        t.transform.rotation.w = streamer.r
+
+        self.transform_br.sendTransform(t)
         self.imu_pub.publish(imu_msg)
         self.odom_pub.publish(odom_msg)
 
