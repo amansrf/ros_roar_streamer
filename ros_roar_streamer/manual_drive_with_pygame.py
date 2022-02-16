@@ -142,11 +142,9 @@ class ManualControl:
 
                 if hori > 0:
                     self.steering_offset = np.clip(self.steering_offset + self.gear_steering_step, -1, 1)
-                    self.ios_config.steering_offset = self.steering_offset
 
                 elif hori < 0:
                     self.steering_offset = np.clip(self.steering_offset - self.gear_steering_step, -1, 1)
-                    self.ios_config.steering_offset = self.steering_offset
 
         is_brake = False
         is_switch_auto_pressed = False
@@ -167,7 +165,7 @@ class ManualControl:
             self.last_switch_press_time = time.get_ticks()
         
         t = np.clip(self.throttle, self.max_reverse_throttle, self.max_forward_throttle)
-        s = np.clip(self.steering, -self.max_steering, self.max_steering)
+        s = np.clip(self.steering+self.steering_offset, -self.max_steering, self.max_steering)
 
         return True, (t,s), is_switch_auto_pressed
 

@@ -8,7 +8,7 @@ config = {
     "max_forward_throttle": 0.2,
     "max_reverse_throttle": -0.2,
     "max_steering": 1.0,
-    "steering_offset": 0.0,
+    "steering_offset": -0.2,
     "invert_steering": False,
     "pygame_display_width": 360,
     "pygame_display_height": 720,
