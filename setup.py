@@ -28,6 +28,7 @@ setup(
             'state_streamer = ros_roar_streamer.state_streamer:main',
             'rgb_streamer = ros_roar_streamer.rgb_streamer:main',
             'depth_streamer = ros_roar_streamer.depth_streamer:main',
+            'manual_drive_with_pygame = ros_roar_streamer.manual_drive_with_pygame:main'
         ],
     },
 )

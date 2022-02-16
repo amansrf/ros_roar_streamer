@@ -122,6 +122,7 @@ class StateStreamer(Node):
         imu_msg.linear_acceleration.y = G*streamer.acceleration.y
         imu_msg.linear_acceleration.z = G*streamer.acceleration.z
         
+        
         ### Constructing Odom Message
         odom_msg = Odometry()
         odom_msg.header.frame_id = 'odom'
