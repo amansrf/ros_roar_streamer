@@ -37,7 +37,7 @@ class ControlStreamer(Node):
     
     def send_control_over_udp(self, data):
         # Debug Only
-        self.get_logger().info('I heard: "%s"' % data)
+        # self.get_logger().info('I heard: "%s"' % data)
 
         #Clipping Steering and throttle values to safe region.
         data.steer = np.clip(data.steer, -1, 1)
