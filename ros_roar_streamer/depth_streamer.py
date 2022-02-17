@@ -109,7 +109,11 @@ def main(args=None):
 
     depth_streamer = DepthStreamer()
 
-    rclpy.spin(depth_streamer)
+    try:
+        rclpy.spin(depth_streamer)
+    except KeyboardInterrupt:
+        pass 
+
 
     depth_streamer.destroy_node()
     rclpy.shutdown()

@@ -101,6 +101,7 @@ class UDPStreamer(Module):
                 self.restart_socket()
                 return None
 
+
     def restart_socket(self):
         if self.s is not None:
             self.s.close()

@@ -107,9 +107,10 @@ def main(args=None):
     rclpy.init(args=args)
 
     rgb_streamer = RGBStreamer()
-
-    rclpy.spin(rgb_streamer)
-
+    try:
+        rclpy.spin(rgb_streamer)
+    except KeyboardInterrupt:
+        pass 
     rgb_streamer.destroy_node()
     rclpy.shutdown()
 

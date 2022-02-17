@@ -51,8 +51,10 @@ def main(args=None):
     rclpy.init(args=args)
 
     control_streamer = ControlStreamer()
-
-    rclpy.spin(control_streamer)
+    try:
+        rclpy.spin(control_streamer)
+    except KeyboardInterrupt:
+        pass 
 
     control_streamer.destroy_node()
     rclpy.shutdown()

@@ -4,11 +4,12 @@ from launch.substitutions import Command, LaunchConfiguration
 from launch_ros.descriptions import ParameterValue
 import launch_ros
 import os
+from  pathlib import Path
 
 def generate_launch_description():
     pkg_share = launch_ros.substitutions.FindPackageShare(package='ros_roar_streamer').find('ros_roar_streamer')
-    default_model_path = os.path.join(pkg_share, 'roar_bot.urdf.xacro')
-    default_rviz_config_path = os.path.join(pkg_share, 'urdf.rviz')
+    default_model_path = (Path(pkg_share) / "URDF" / "roar_bot.urdf.xacro").as_posix()
+    default_rviz_config_path = os.path.join(pkg_share, '/config/urdf.rviz')
     
     robot_state_publisher_node = launch_ros.actions.Node(
         package='robot_state_publisher',
