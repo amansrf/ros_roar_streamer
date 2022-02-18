@@ -7,7 +7,7 @@ from ament_index_python.packages import get_package_share_directory
 def generate_launch_description():
 
     base_path = os.path.realpath(get_package_share_directory('ros_roar_streamer')) # also tried without realpath
-    rviz_path=base_path+'/default_config.rviz'
+    rviz_path=base_path+'/config/default_config.rviz'
     print(rviz_path)
     return LaunchDescription(
         [

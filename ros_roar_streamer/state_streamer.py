@@ -89,7 +89,7 @@ class StateStreamer(Node):
                                     threaded=True)
         self.imu_pub = self.create_publisher(Imu, '/demo/imu', 10)
         self.odom_pub = self.create_publisher(Odometry, '/demo/odom', 10)
-        # self.transform_br = TransformBroadcaster(self) 
+        self.transform_br = TransformBroadcaster(self) 
 
         timer_period = cfg.config["query_rate"]  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
@@ -143,22 +143,22 @@ class StateStreamer(Node):
         odom_msg.twist.twist.angular.z = float(streamer.gyro.z)
 
         # ### construct transform information
-        # t = TransformStamped()
-        # t.header.stamp = self.get_clock().now().to_msg()
-        # t.header.frame_id = "world"
-        # t.child_frame_id = "iPhone"
+        t = TransformStamped()
+        t.header.stamp = self.get_clock().now().to_msg()
+        t.header.frame_id = "world"
+        t.child_frame_id = "base_link"
 
-        # t.transform.translation.x = streamer.transform.location.x
-        # t.transform.translation.y = streamer.transform.location.y
-        # t.transform.translation.z = streamer.transform.location.z
+        t.transform.translation.x = streamer.transform.location.x
+        t.transform.translation.y = streamer.transform.location.y
+        t.transform.translation.z = streamer.transform.location.z
 
-        # t.transform.rotation.x = streamer.ix
-        # t.transform.rotation.y = streamer.iy
-        # t.transform.rotation.z = streamer.iz
-        # t.transform.rotation.w = streamer.r
+        t.transform.rotation.x = streamer.ix
+        t.transform.rotation.y = streamer.iy
+        t.transform.rotation.z = streamer.iz
+        t.transform.rotation.w = streamer.r
 
-        # self.transform_br.sendTransform(t)
-        # self.imu_pub.publish(imu_msg)
+        self.transform_br.sendTransform(t)
+        self.imu_pub.publish(imu_msg)
         self.odom_pub.publish(odom_msg)
 
         # self.get_logger().info('Publishing odom: "%s"' % odom_msg)
