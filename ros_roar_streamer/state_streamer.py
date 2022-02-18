@@ -87,8 +87,8 @@ class StateStreamer(Node):
                                     name="VehicleStateStreamer",
                                     update_interval=0.025,
                                     threaded=True)
-        self.imu_pub = self.create_publisher(Imu, '/demo/imu', 10)
-        self.odom_pub = self.create_publisher(Odometry, '/demo/odom', 10)
+        # self.imu_pub = self.create_publisher(Imu, '/demo/imu', 10)
+        self.odom_pub = self.create_publisher(Odometry, '/odom', 10)
         self.transform_br = TransformBroadcaster(self) 
 
         timer_period = cfg.config["query_rate"]  # seconds
@@ -122,19 +122,19 @@ class StateStreamer(Node):
         # imu_msg.linear_acceleration.z = G*streamer.acceleration.z
         
         
-        # ### Constructing Odom Message
-        # odom_msg = Odometry()
-        # odom_msg.header.frame_id = 'world'
-        # odom_msg.child_frame_id = 'base_link'
-        # odom_msg.header.stamp = self.get_clock().now().to_msg()
-        # odom_msg.pose.pose.position.x = streamer.transform.location.x
-        # odom_msg.pose.pose.position.y = streamer.transform.location.y
-        # odom_msg.pose.pose.position.z = streamer.transform.location.z
-        # odom_msg.pose.pose.orientation = Quaternion()
-        # odom_msg.pose.pose.orientation.x = streamer.ix
-        # odom_msg.pose.pose.orientation.y = streamer.iy
-        # odom_msg.pose.pose.orientation.z = streamer.iz
-        # odom_msg.pose.pose.orientation.w = streamer.r
+        ### Constructing Odom Message
+        odom_msg = Odometry()
+        odom_msg.header.frame_id = 'base_link'
+        odom_msg.child_frame_id = 'odom'
+        odom_msg.header.stamp = self.get_clock().now().to_msg()
+        odom_msg.pose.pose.position.x = streamer.transform.location.x
+        odom_msg.pose.pose.position.y = streamer.transform.location.y
+        odom_msg.pose.pose.position.z = streamer.transform.location.z
+        odom_msg.pose.pose.orientation = Quaternion()
+        odom_msg.pose.pose.orientation.x = streamer.ix
+        odom_msg.pose.pose.orientation.y = streamer.iy
+        odom_msg.pose.pose.orientation.z = streamer.iz
+        odom_msg.pose.pose.orientation.w = streamer.r
         # odom_msg.twist.twist.linear.x = float(streamer.velocity.x)
         # odom_msg.twist.twist.linear.y = float(streamer.velocity.y)
         # odom_msg.twist.twist.linear.z = float(streamer.velocity.z)
@@ -159,7 +159,7 @@ class StateStreamer(Node):
 
         self.transform_br.sendTransform(t)
         # self.imu_pub.publish(imu_msg)
-        # self.odom_pub.publish(odom_msg)
+        self.odom_pub.publish(odom_msg)
 
         # self.get_logger().info('Publishing odom: "%s"' % odom_msg)
         # self.get_logger().info('Publishing imu: "%s"' % imu_msg)

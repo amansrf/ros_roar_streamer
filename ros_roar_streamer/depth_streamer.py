@@ -67,7 +67,7 @@ class DepthStreamer(Node):
                                        update_interval=0.05,
                                        threaded=True)
         self.depth_image_pub = self.create_publisher(Image, 'depth_image', 10)
-        self.depth_info_pub = self.create_publisher(CameraInfo, 'depth_img_info', 10)
+        self.depth_info_pub = self.create_publisher(CameraInfo, 'camera_info', 10)
 
         timer_period = cfg.config["query_rate"]  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)

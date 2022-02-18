@@ -68,7 +68,7 @@ class RGBStreamer(Node):
                                      update_interval=0.025,
                                      threaded=True)
         self.rgb_image_pub = self.create_publisher(Image, 'rgb_image', 10)
-        self.rgb_info_pub = self.create_publisher(CameraInfo, 'rgb_img_info', 10)
+        self.rgb_info_pub = self.create_publisher(CameraInfo, 'camera_info', 10)
 
         timer_period = cfg.config["query_rate"]  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
@@ -99,7 +99,9 @@ class RGBStreamer(Node):
             rgb_info_msg.p = [fx, 0.0, cx, 0.0, 0.0, fy, cy, 0.0, 0.0, 0.0, 1.0, 0.0]
 
             rgb_img_msg = bridge.cv2_to_imgmsg(img, encoding="bgr8")
-            rgb_img_msg.header.stamp = self.get_clock().now().to_msg()
+            rgb_info_msg.header.stamp = rgb_img_msg.header.stamp = self.get_clock().now().to_msg()
+            rgb_img_msg.header.frame_id ='base_link'
+
             self.rgb_image_pub.publish(rgb_img_msg)
             self.rgb_info_pub.publish(rgb_info_msg)
 

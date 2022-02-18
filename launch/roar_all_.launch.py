@@ -81,5 +81,10 @@ def generate_launch_description():
             executable="state_streamer",
             name="state_streamer"
         ),
+            Node(package="ros_roar_streamer",
+            namespace="pointcloud_publisher",
+            executable="pointcloud_publisher",
+            name="pointcloud_publisher"
+        )
         ]
     )
