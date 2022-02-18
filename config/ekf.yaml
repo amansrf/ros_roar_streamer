@@ -27,21 +27,21 @@ ekf_filter_node:
 #     3a. Set your "world_frame" to your map_frame value
 #     3b. MAKE SURE something else is generating the odom->base_link transform. Note that this can even be another state estimation node
 #         from robot_localization! However, that instance should *not* fuse the global data.
-        map_frame: map              # Defaults to "map" if unspecified
+#        map_frame: world              # Defaults to "map" if unspecified
         odom_frame: odom            # Defaults to "odom" if unspecified
         base_link_frame: base_link  # Defaults to "base_link" ifunspecified
         world_frame: odom           # Defaults to the value ofodom_frame if unspecified
 
         odom0: demo/odom
-        odom0_config: [true,  true,  true,
-                       false, false, false,
-                       false, false, false,
-                       false, false, true,
-                       false, false, false]
+        odom0_config: [true,  true,  true, #x, y, z, 
+                       true, true, true, # roll, pitch, yaw, 
+                       false, false, false, # vx, vy, vz, 
+                       false, false, false, # vroll, vpitch, vyaw, 
+                       false, false, false] # ax, ay, az
 
-        imu0: demo/imu
-        imu0_config: [false, false, false,
-                      true,  true,  true,
-                      false, false, false,
-                      false, false, false,
-                      false, false, false]
+        # imu0: demo/imu
+        # imu0_config: [true,  true,  true, #x, y, z, 
+        #                true, true, true, # roll, pitch, yaw, 
+        #                false, false, false, # vx, vy, vz, 
+        #                false, false, false, # vroll, vpitch, vyaw, 
+        #                false, false, false] # ax, ay, az

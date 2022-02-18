@@ -50,6 +50,19 @@
       <xacro:box_inertia m="15" w="${base_width}" d="${base_length}" h="${base_height}"/>
   </link>
 
+  <!-- Robot Footprint -->
+  	
+
+  <!-- Robot Footprint -->
+  <link name="base_footprint"/>
+
+  <joint name="base_joint" type="fixed">
+    <parent link="base_link"/>
+    <child link="base_footprint"/>
+    <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+  </joint>
+
+
   <!-- iphone mount -->
   <link name="iphone_link">
     <visual>
@@ -72,7 +85,7 @@
       <xacro:box_inertia m="5" w="${iphone_width}" d="${iphone_length}" h="${iphone_height}"/>
 
   </link>
-  <joint name="$iphone" type="fixed">
+  <joint name="iphone" type="fixed">
       <parent link="base_link"/>
       <child link="iphone_link"/>
       <origin xyz="0 ${base_length/4} ${iphone_height/2+base_height/2}" rpy="0 0 0"/>

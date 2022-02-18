@@ -99,53 +99,53 @@ class StateStreamer(Node):
         streamer.run_in_series()
 
         ### DEBUG ONLY
-        q = quaternion_from_euler(streamer.transform.rotation.roll, 
-                              streamer.transform.rotation.pitch,
-                              streamer.transform.rotation.yaw)
+        # q = quaternion_from_euler(streamer.transform.rotation.roll, 
+        #                       streamer.transform.rotation.pitch,
+        #                       streamer.transform.rotation.yaw)
         
         ### Constructing Imu Message
-        imu_msg = Imu()
-        imu_msg.header.frame_id = 'base_link'
-        imu_msg.header.stamp = self.get_clock().now().to_msg()
-        # imu_msg.orientation = Quaternion(q[0], q[1], q[2], q[3])
-        imu_msg.orientation = Quaternion()
-        imu_msg.orientation.x = streamer.ix
-        imu_msg.orientation.y = streamer.iy
-        imu_msg.orientation.z = streamer.iz
-        imu_msg.orientation.w = streamer.r
-        imu_msg.orientation_covariance = [-1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
-        imu_msg.angular_velocity.x = float(streamer.gyro.x)
-        imu_msg.angular_velocity.y = float(streamer.gyro.y)
-        imu_msg.angular_velocity.z = float(streamer.gyro.z)
-        imu_msg.linear_acceleration.x = G*streamer.acceleration.x
-        imu_msg.linear_acceleration.y = G*streamer.acceleration.y
-        imu_msg.linear_acceleration.z = G*streamer.acceleration.z
+        # imu_msg = Imu()
+        # imu_msg.header.frame_id = 'base_link'
+        # imu_msg.header.stamp = self.get_clock().now().to_msg()
+        # # imu_msg.orientation = Quaternion(q[0], q[1], q[2], q[3])
+        # imu_msg.orientation = Quaternion()
+        # imu_msg.orientation.x = streamer.ix
+        # imu_msg.orientation.y = streamer.iy
+        # imu_msg.orientation.z = streamer.iz
+        # imu_msg.orientation.w = streamer.r
+        # imu_msg.orientation_covariance = [-1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+        # imu_msg.angular_velocity.x = float(streamer.gyro.x)
+        # imu_msg.angular_velocity.y = float(streamer.gyro.y)
+        # imu_msg.angular_velocity.z = float(streamer.gyro.z)
+        # imu_msg.linear_acceleration.x = G*streamer.acceleration.x
+        # imu_msg.linear_acceleration.y = G*streamer.acceleration.y
+        # imu_msg.linear_acceleration.z = G*streamer.acceleration.z
         
         
         # ### Constructing Odom Message
-        odom_msg = Odometry()
-        odom_msg.header.frame_id = 'odom'
-        odom_msg.child_frame_id = 'base_link'
-        odom_msg.header.stamp = self.get_clock().now().to_msg()
-        odom_msg.pose.pose.position.x = streamer.transform.location.x
-        odom_msg.pose.pose.position.y = streamer.transform.location.y
-        odom_msg.pose.pose.position.z = streamer.transform.location.z
-        odom_msg.pose.pose.orientation = Quaternion()
-        odom_msg.pose.pose.orientation.x = streamer.ix
-        odom_msg.pose.pose.orientation.y = streamer.iy
-        odom_msg.pose.pose.orientation.z = streamer.iz
-        odom_msg.pose.pose.orientation.w = streamer.r
-        odom_msg.twist.twist.linear.x = float(streamer.velocity.x)
-        odom_msg.twist.twist.linear.y = float(streamer.velocity.y)
-        odom_msg.twist.twist.linear.z = float(streamer.velocity.z)
-        odom_msg.twist.twist.angular.x = float(streamer.gyro.x)
-        odom_msg.twist.twist.angular.y = float(streamer.gyro.y)
-        odom_msg.twist.twist.angular.z = float(streamer.gyro.z)
+        # odom_msg = Odometry()
+        # odom_msg.header.frame_id = 'world'
+        # odom_msg.child_frame_id = 'base_link'
+        # odom_msg.header.stamp = self.get_clock().now().to_msg()
+        # odom_msg.pose.pose.position.x = streamer.transform.location.x
+        # odom_msg.pose.pose.position.y = streamer.transform.location.y
+        # odom_msg.pose.pose.position.z = streamer.transform.location.z
+        # odom_msg.pose.pose.orientation = Quaternion()
+        # odom_msg.pose.pose.orientation.x = streamer.ix
+        # odom_msg.pose.pose.orientation.y = streamer.iy
+        # odom_msg.pose.pose.orientation.z = streamer.iz
+        # odom_msg.pose.pose.orientation.w = streamer.r
+        # odom_msg.twist.twist.linear.x = float(streamer.velocity.x)
+        # odom_msg.twist.twist.linear.y = float(streamer.velocity.y)
+        # odom_msg.twist.twist.linear.z = float(streamer.velocity.z)
+        # odom_msg.twist.twist.angular.x = float(streamer.gyro.x)
+        # odom_msg.twist.twist.angular.y = float(streamer.gyro.y)
+        # odom_msg.twist.twist.angular.z = float(streamer.gyro.z)
 
         # ### construct transform information
         t = TransformStamped()
         t.header.stamp = self.get_clock().now().to_msg()
-        t.header.frame_id = "world"
+        t.header.frame_id = "odom"
         t.child_frame_id = "base_link"
 
         t.transform.translation.x = streamer.transform.location.x
@@ -158,8 +158,8 @@ class StateStreamer(Node):
         t.transform.rotation.w = streamer.r
 
         self.transform_br.sendTransform(t)
-        self.imu_pub.publish(imu_msg)
-        self.odom_pub.publish(odom_msg)
+        # self.imu_pub.publish(imu_msg)
+        # self.odom_pub.publish(odom_msg)
 
         # self.get_logger().info('Publishing odom: "%s"' % odom_msg)
         # self.get_logger().info('Publishing imu: "%s"' % imu_msg)
