@@ -1,14 +1,14 @@
 from sympy import EX, im
-import rclpy 
-from rclpy.node import MsgType, Node 
+import rclpy
+from rclpy.node import MsgType, Node
 from sensor_msgs.msg import Image
-import pygame 
-import numpy as np 
+import pygame
+import numpy as np
 from typing import Optional, Tuple
 from cv_bridge import CvBridge
-import cv2 
+import cv2
 from pygame import *
-import sys 
+import sys
 from . import config as cfg
 import logging
 from carla_msgs.msg import CarlaEgoVehicleControl
@@ -16,19 +16,41 @@ from carla_msgs.msg import CarlaEgoVehicleControl
 
 class ManualDriveWithPyGame(Node):
     def __init__(self):
-        super().__init__('manual_drive_with_pygame')
+        super().__init__("manual_drive_with_pygame")
+        self.declare_parameter("max_reverse_throttle", -1.0)
+        self.declare_parameter("max_forward_throttle", 1.0)
+        self.declare_parameter("max_steering", 1.0)
+        self.declare_parameter("steering_offset", 0.0)
+
+        self.max_reverse_throttle = (
+            self.get_parameter("max_reverse_throttle")
+            .get_parameter_value()
+            .double_value
+        )
+        self.max_forward_throttle = (
+            self.get_parameter("max_forward_throttle")
+            .get_parameter_value()
+            .double_value
+        )
+        self.max_steering = (
+            self.get_parameter("max_steering").get_parameter_value().double_value
+        )
+        self.steering_offset = (
+            self.get_parameter("steering_offset").get_parameter_value().double_value
+        )
+
         self.pygame_display_width = cfg.config["pygame_display_width"]
-        self.pygame_display_height= cfg.config["pygame_display_height"] 
+        self.pygame_display_height = cfg.config["pygame_display_height"]
         self.subscription = self.create_subscription(
             msg_type=Image,
             topic="/rgb_streamer/rgb_image",
             callback=self.on_rgb_image_received,
-            qos_profile=10
+            qos_profile=10,
         )
         self.carla_msg_publisher = self.create_publisher(
             msg_type=CarlaEgoVehicleControl,
             topic="/carla/ego_vehicle/vehicle_control_cmd_manual",
-            qos_profile=1
+            qos_profile=1,
         )
         self.rgb: Optional[np.ndarray] = None
         self.bridge = CvBridge()
@@ -38,22 +60,19 @@ class ManualDriveWithPyGame(Node):
         self.timer = self.create_timer(0.05, self.pygame_keyboard_callback)
         self.manual_controller = ManualControl()
 
-
     def pygame_keyboard_callback(self):
-        should_continue, control, _ = self.manual_controller.parse_events(clock=self.clock)
+        should_continue, control, _ = self.manual_controller.parse_events(
+            clock=self.clock
+        )
         if should_continue is False:
             self.timer.cancel()
             pygame.display.quit()
             pygame.quit()
             rclpy.try_shutdown()
-            
-        else:
-            control = CarlaEgoVehicleControl(
-                throttle=control[0],
-                steer=control[1]
-            )
-            self.carla_msg_publisher.publish(control)
 
+        else:
+            control = CarlaEgoVehicleControl(throttle=control[0], steer=control[1])
+            self.carla_msg_publisher.publish(control)
 
     def setup_pygame(self):
         """
@@ -62,10 +81,11 @@ class ManualDriveWithPyGame(Node):
         """
         pygame.init()
         pygame.font.init()
-        self.display = pygame.display.set_mode((self.pygame_display_width,
-                                                self.pygame_display_height))
+        self.display = pygame.display.set_mode(
+            (self.pygame_display_width, self.pygame_display_height)
+        )
 
-    def on_rgb_image_received(self, msg:Image):
+    def on_rgb_image_received(self, msg: Image):
         try:
             frame = self.bridge.imgmsg_to_cv2(msg, "bgr8")
             frame = np.array(frame, dtype=np.uint8)
@@ -75,8 +95,12 @@ class ManualDriveWithPyGame(Node):
                 # min_y = s[0] - height - self.vertical_view_offset
                 # max_y = s[0] - self.vertical_view_offset
                 # frame = frame[min_y:max_y, :]
-                frame = cv2.resize(frame, dsize=(self.pygame_display_width, self.pygame_display_height))
-                frame: np.ndarray = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB).swapaxes(0, 1)
+                frame = cv2.resize(
+                    frame, dsize=(self.pygame_display_width, self.pygame_display_height)
+                )
+                frame: np.ndarray = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB).swapaxes(
+                    0, 1
+                )
                 pygame.surfarray.blit_array(self.display, frame)
                 pygame.display.flip()
         except Exception as e:
@@ -84,15 +108,23 @@ class ManualDriveWithPyGame(Node):
 
 
 class ManualControl:
-    def __init__(self, throttle_increment=0.05, steering_increment=0.05):
+    def __init__(
+        self,
+        throttle_increment=0.05,
+        steering_increment=0.05,
+        max_reverse_throttle=-1.0,
+        max_forward_throttle=1.0,
+        max_steering=1.0,
+        steering_offset=0.0,
+    ):
         self.logger = logging.getLogger(__name__)
         self._steering_increment = steering_increment
         self._throttle_increment = throttle_increment
-        self.max_reverse_throttle = cfg.config["max_reverse_throttle"]
-        self.max_forward_throttle = cfg.config["max_forward_throttle"]
-        self.max_steering = cfg.config["max_steering"]
+        self.max_reverse_throttle = max_reverse_throttle
+        self.max_forward_throttle = max_forward_throttle
+        self.max_steering = max_steering
 
-        self.steering_offset = cfg.config["steering_offset"]
+        self.steering_offset = steering_offset
 
         self.gear_throttle_step = 0.05
         self.gear_steering_step = 0.01
@@ -106,7 +138,9 @@ class ManualControl:
             pygame.joystick.init()
             self.joystick = pygame.joystick.Joystick(0)
             self.joystick.init()
-            self.logger.info(f"Joystick [{self.joystick.get_name()}] detected, Using Joytick")
+            self.logger.info(
+                f"Joystick [{self.joystick.get_name()}] detected, Using Joytick"
+            )
             self.use_joystick = True
         except Exception as e:
             self.logger.info("No joystick detected. Plz use your keyboard instead")
@@ -134,17 +168,25 @@ class ManualControl:
             if event.type == pygame.JOYHATMOTION:
                 hori, vert = self.joystick.get_hat(0)
                 if vert > 0:
-                    self.max_forward_throttle = np.clip(self.max_forward_throttle + self.gear_throttle_step, 0, 1)
+                    self.max_forward_throttle = np.clip(
+                        self.max_forward_throttle + self.gear_throttle_step, 0, 1
+                    )
                     self.ios_config.max_forward_throttle = self.max_forward_throttle
                 elif vert < 0:
-                    self.max_forward_throttle = np.clip(self.max_forward_throttle - self.gear_throttle_step, 0, 1)
+                    self.max_forward_throttle = np.clip(
+                        self.max_forward_throttle - self.gear_throttle_step, 0, 1
+                    )
                     self.ios_config.max_forward_throttle = self.max_forward_throttle
 
                 if hori > 0:
-                    self.steering_offset = np.clip(self.steering_offset + self.gear_steering_step, -1, 1)
+                    self.steering_offset = np.clip(
+                        self.steering_offset + self.gear_steering_step, -1, 1
+                    )
 
                 elif hori < 0:
-                    self.steering_offset = np.clip(self.steering_offset - self.gear_steering_step, -1, 1)
+                    self.steering_offset = np.clip(
+                        self.steering_offset - self.gear_steering_step, -1, 1
+                    )
 
         is_brake = False
         is_switch_auto_pressed = False
@@ -163,11 +205,13 @@ class ManualControl:
         if key_pressed[K_m] and time.get_ticks() - self.last_switch_press_time > 100:
             is_switch_auto_pressed = True
             self.last_switch_press_time = time.get_ticks()
-        
-        t = np.clip(self.throttle, self.max_reverse_throttle, self.max_forward_throttle)
-        s = np.clip(self.steering+self.steering_offset, -self.max_steering, self.max_steering)
 
-        return True, (t,s), is_switch_auto_pressed
+        t = np.clip(self.throttle, self.max_reverse_throttle, self.max_forward_throttle)
+        s = np.clip(
+            self.steering + self.steering_offset, -self.max_steering, self.max_steering
+        )
+
+        return True, (t, s), is_switch_auto_pressed
 
     def _parse_joystick(self) -> Tuple[float, float]:
         # code to test which axis is your controller using
@@ -230,12 +274,17 @@ class ManualControl:
             self.steering = 0
 
         if keys[K_LEFT]:
-            self.steering_offset = np.clip(self.steering_offset - self.gear_steering_step, -1, 1)
+            self.steering_offset = np.clip(
+                self.steering_offset - self.gear_steering_step, -1, 1
+            )
             self.ios_config.steering_offset = self.steering_offset
         elif keys[K_RIGHT]:
-            self.steering_offset = np.clip(self.steering_offset + self.gear_steering_step, -1, 1)
+            self.steering_offset = np.clip(
+                self.steering_offset + self.gear_steering_step, -1, 1
+            )
             self.ios_config.steering_offset = self.steering_offset
         return round(self.throttle, 5), round(self.steering, 5)
+
 
 def main(args=None):
     rclpy.init(args=args)
@@ -243,11 +292,11 @@ def main(args=None):
     try:
         rclpy.spin(mdp)
     except KeyboardInterrupt:
-        pass 
+        pass
     finally:
         mdp.destroy_node()
         # mdp.shutdown()
 
-if __name__ == '__main__':
-    main()
 
+if __name__ == "__main__":
+    main()
