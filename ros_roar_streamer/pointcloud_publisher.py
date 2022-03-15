@@ -31,14 +31,12 @@ class PointCloudPublisher(Node):
         self.rgb_image_sub = message_filters.Subscriber(
             self, Image, "/rgb_streamer/rgb_image"
         )
-        self.odom = message_filters.Subscriber(self, Odometry, "/odom")
         self.bridge = CvBridge()
         self.ats = message_filters.ApproximateTimeSynchronizer(
             [
                 self.depth_image_sub,
                 self.depth_image_info_sub,
                 self.rgb_image_sub,
-                self.odom,
             ],
             queue_size=5,
             slop=0.1,
@@ -52,7 +50,6 @@ class PointCloudPublisher(Node):
         depth_image_msg: Image,
         depth_image_info_msg: CameraInfo,
         rgb_image_msg: Image,
-        odom: Odometry,
     ):
         depth_img = self.bridge.imgmsg_to_cv2(
             depth_image_msg, desired_encoding="passthrough"
@@ -80,28 +77,8 @@ class PointCloudPublisher(Node):
             cx=depth_intrinsics[0][2],
             cy=depth_intrinsics[1][2],
         )
-        extrinsics = np.eye(4)
-        quat = np.array(
-            [
-                odom.pose.pose.orientation.x,
-                odom.pose.pose.orientation.y,
-                odom.pose.pose.orientation.z,
-                odom.pose.pose.orientation.w,
-            ]
-        )
-        trans = np.array(
-            [
-                odom.pose.pose.position.x,
-                odom.pose.pose.position.y,
-                odom.pose.pose.position.z,
-                1,
-            ]
-        )
-        rotation_matrix = o3d.geometry.get_rotation_matrix_from_quaternion(quat)
-        extrinsics[0:3, 0:3] = rotation_matrix
-        extrinsics[3, :] = trans
         pcd: o3d.geometry.PointCloud = o3d.geometry.PointCloud.create_from_rgbd_image(
-            image=rgbd, intrinsic=intrinsic, extrinsic=extrinsics
+            image=rgbd, intrinsic=intrinsic
         )
 
         points = np.asarray(pcd.points).astype(np.float32)
