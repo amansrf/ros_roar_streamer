@@ -1,4 +1,6 @@
 from setuptools import setup
+import os 
+from glob import glob 
 
 package_name = 'ros_roar_streamer'
 
@@ -10,6 +12,9 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
+        (os.path.join('share', package_name), glob('launch/*.launch.py')),
+        (os.path.join(os.path.join('share', package_name), "config"), glob('config/*')),
+        (os.path.join(os.path.join('share', package_name), "URDF"), glob('URDF/*'))
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -24,6 +29,8 @@ setup(
             'state_streamer = ros_roar_streamer.state_streamer:main',
             'rgb_streamer = ros_roar_streamer.rgb_streamer:main',
             'depth_streamer = ros_roar_streamer.depth_streamer:main',
+            'pointcloud_publisher = ros_roar_streamer.pointcloud_publisher:main',
+            'manual_drive_with_pygame = ros_roar_streamer.manual_drive_with_pygame:main'
         ],
     },
 )
