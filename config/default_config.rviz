@@ -8,7 +8,6 @@ Panels:
         - /Status1
         - /TF1
         - /TF1/Frames1
-        - /TF1/Frames1/iPhone1
       Splitter Ratio: 0.5
     Tree Height: 227
   - Class: rviz_common/Selection
@@ -78,9 +77,9 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: true
-        iPhone:
+        base_link:
           Value: true
-        world:
+        odom:
           Value: true
       Marker Scale: 1
       Name: TF
@@ -88,15 +87,15 @@ Visualization Manager:
       Show Axes: true
       Show Names: false
       Tree:
-        world:
-          iPhone:
+        odom:
+          base_link:
             {}
       Update Interval: 0
       Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
-    Fixed Frame: world
+    Fixed Frame: odom
     Frame Rate: 30
   Name: root
   Tools:
@@ -172,5 +171,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1618
-  X: 2449
-  Y: 91
+  X: 471
+  Y: 66

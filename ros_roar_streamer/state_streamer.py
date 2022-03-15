@@ -24,12 +24,13 @@ import time
 from . import config as cfg
 
 sys.path.append(Path(os.getcwd()).parent.as_posix())
-from . udp_receiver import UDPStreamer
-from . data_structures_models import Transform, Vector3D
+from .udp_receiver import UDPStreamer
+from .data_structures_models import Transform, Vector3D
 
 G = cfg.config["G"]
 ip = cfg.config["ip_address"]
 PUB_RATE = cfg.config["query_rate"]
+
 
 class VehicleStateStreamer(UDPStreamer):
     def __init__(self, **kwargs):
@@ -38,7 +39,7 @@ class VehicleStateStreamer(UDPStreamer):
         self.velocity = Vector3D()
         self.acceleration = Vector3D()
         self.gyro = Vector3D()
-        
+
         self.ix = float(0)
         self.iy = float(0)
         self.iz = float(0)
@@ -49,7 +50,7 @@ class VehicleStateStreamer(UDPStreamer):
             data = self.recv()
             if data is None:
                 return
-            d = [float(s) for s in data.decode('utf-8').split(",")]
+            d = [float(s) for s in data.decode("utf-8").split(",")]
             # d = np.frombuffer(data, dtype=np.float32)
             self.transform.location.x = d[0]
             self.transform.location.y = d[1]
@@ -78,18 +79,24 @@ class VehicleStateStreamer(UDPStreamer):
         except Exception as e:
             self.logger.error(e)
 
-class StateStreamer(Node):
 
+class StateStreamer(Node):
     def __init__(self):
-        super().__init__('state_streamer')
-        self.streamer = VehicleStateStreamer(ios_address=ip,
-                                    port=8003,
-                                    name="VehicleStateStreamer",
-                                    update_interval=0.025,
-                                    threaded=True)
+        super().__init__("state_streamer")
+        self.declare_parameter("ios_ip_address", "127.0.0.1")
+        self.ios_ip_address = (
+            self.get_parameter("ios_ip_address").get_parameter_value().string_value
+        )
+        self.streamer = VehicleStateStreamer(
+            ios_address=self.ios_ip_address,
+            port=8003,
+            name="VehicleStateStreamer",
+            update_interval=0.025,
+            threaded=True,
+        )
         # self.imu_pub = self.create_publisher(Imu, '/demo/imu', 10)
-        self.odom_pub = self.create_publisher(Odometry, '/odom', 10)
-        self.transform_br = TransformBroadcaster(self) 
+        self.odom_pub = self.create_publisher(Odometry, "/odom", 10)
+        self.transform_br = TransformBroadcaster(self)
 
         timer_period = cfg.config["query_rate"]  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
@@ -99,10 +106,10 @@ class StateStreamer(Node):
         streamer.run_in_series()
 
         ### DEBUG ONLY
-        # q = quaternion_from_euler(streamer.transform.rotation.roll, 
+        # q = quaternion_from_euler(streamer.transform.rotation.roll,
         #                       streamer.transform.rotation.pitch,
         #                       streamer.transform.rotation.yaw)
-        
+
         ### Constructing Imu Message
         # imu_msg = Imu()
         # imu_msg.header.frame_id = 'base_link'
@@ -120,12 +127,11 @@ class StateStreamer(Node):
         # imu_msg.linear_acceleration.x = G*streamer.acceleration.x
         # imu_msg.linear_acceleration.y = G*streamer.acceleration.y
         # imu_msg.linear_acceleration.z = G*streamer.acceleration.z
-        
-        
+
         ### Constructing Odom Message
         odom_msg = Odometry()
-        odom_msg.header.frame_id = 'base_link'
-        odom_msg.child_frame_id = 'odom'
+        odom_msg.header.frame_id = "base_link"
+        odom_msg.child_frame_id = "odom"
         odom_msg.header.stamp = self.get_clock().now().to_msg()
         odom_msg.pose.pose.position.x = streamer.transform.location.x
         odom_msg.pose.pose.position.y = streamer.transform.location.y
@@ -164,6 +170,7 @@ class StateStreamer(Node):
         # self.get_logger().info('Publishing odom: "%s"' % odom_msg)
         # self.get_logger().info('Publishing imu: "%s"' % imu_msg)
 
+
 def main(args=None):
     rclpy.init(args=args)
 
@@ -171,12 +178,11 @@ def main(args=None):
     try:
         rclpy.spin(state_streamer)
     except KeyboardInterrupt:
-        pass 
-
+        pass
 
     state_streamer.destroy_node()
     rclpy.shutdown()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -23,6 +23,13 @@ def generate_launch_description():
                 namespace="depth_streamer",
                 executable="depth_streamer",
                 name="depth_streamer",
+                parameters=[
+                    {
+                        "ios_ip_address": launch.substitutions.LaunchConfiguration(
+                            "ios_ip_address"
+                        )
+                    },
+                ],
             ),
             Node(
                 package="ros_roar_streamer",
@@ -42,12 +49,26 @@ def generate_launch_description():
                 namespace="control_streamer",
                 executable="control_streamer",
                 name="control_streamer",
+                parameters=[
+                    {
+                        "ios_ip_address": launch.substitutions.LaunchConfiguration(
+                            "ios_ip_address"
+                        )
+                    },
+                ],
             ),
             Node(
                 package="ros_roar_streamer",
                 namespace="state_streamer",
                 executable="state_streamer",
                 name="state_streamer",
+                parameters=[
+                    {
+                        "ios_ip_address": launch.substitutions.LaunchConfiguration(
+                            "ios_ip_address"
+                        )
+                    },
+                ],
             ),
             Node(
                 package="rviz2",
