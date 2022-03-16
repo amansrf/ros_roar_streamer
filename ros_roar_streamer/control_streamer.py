@@ -53,6 +53,12 @@ class ControlStreamer(Node):
         msg = str(data.throttle) + "," + str(data.steer)
         udp_socket.sendto(msg.encode("utf-8"), (self.ios_ip_address, port))
 
+    def destroy_node(self):
+        super().destroy_node()
+        msg = str(0) + "," + str(0)
+        for i in range(10):
+            udp_socket.sendto(msg.encode("utf-8"), (self.ios_ip_address, port))
+
 
 def main(args=None):
     rclpy.init(args=args)
@@ -62,9 +68,10 @@ def main(args=None):
         rclpy.spin(control_streamer)
     except KeyboardInterrupt:
         pass
+    finally:
 
-    control_streamer.destroy_node()
-    rclpy.shutdown()
+        control_streamer.destroy_node()
+        rclpy.shutdown()
 
 
 if __name__ == "__main__":
