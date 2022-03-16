@@ -30,6 +30,7 @@ from .data_structures_models import Transform, Vector3D
 G = cfg.config["G"]
 ip = cfg.config["ip_address"]
 PUB_RATE = cfg.config["query_rate"]
+BUFFER_LENGTH = cfg.config["buffer_length"]
 
 
 class VehicleStateStreamer(UDPStreamer):
@@ -71,6 +72,9 @@ class VehicleStateStreamer(UDPStreamer):
             self.hall_effect_velocity = d[15]
 
             self.recv_time = d[16]
+
+
+            # Quaternions
             self.ix = d[17]
             self.iy = d[18]
             self.iz = d[19]
@@ -82,21 +86,19 @@ class VehicleStateStreamer(UDPStreamer):
 
 class StateStreamer(Node):
     def __init__(self):
-        super().__init__("state_streamer")
-        self.declare_parameter("ios_ip_address", "127.0.0.1")
-        self.ios_ip_address = (
-            self.get_parameter("ios_ip_address").get_parameter_value().string_value
-        )
-        self.streamer = VehicleStateStreamer(
-            ios_address=self.ios_ip_address,
-            port=8003,
-            name="VehicleStateStreamer",
-            update_interval=0.025,
-            threaded=True,
-        )
-        # self.imu_pub = self.create_publisher(Imu, '/demo/imu', 10)
-        self.odom_pub = self.create_publisher(Odometry, "/odom", 10)
-        self.transform_br = TransformBroadcaster(self)
+        super().__init__('state_streamer')
+        
+        # TODO: The streamer update_interval and the timer_period for the callback
+        #       are set aribitrarily for now. This must be fixed to some optimal 
+        #       value to improve latency and prevent sync issues.
+
+        self.streamer = VehicleStateStreamer(ios_address=ip,
+                                    port=8003,
+                                    name="VehicleStateStreamer",
+                                    update_interval=0.025,
+                                    threaded=True)
+        self.imu_pub = self.create_publisher(Imu, 'iPhone_imu', BUFFER_LENGTH)
+        self.odom_pub = self.create_publisher(Odometry, 'iPhone_odom', BUFFER_LENGTH)
 
         timer_period = cfg.config["query_rate"]  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
@@ -106,33 +108,54 @@ class StateStreamer(Node):
         streamer.run_in_series()
 
         ### DEBUG ONLY
-        # q = quaternion_from_euler(streamer.transform.rotation.roll,
-        #                       streamer.transform.rotation.pitch,
-        #                       streamer.transform.rotation.yaw)
 
+        print(self.streamer.transform, streamer.velocity)
+        
         ### Constructing Imu Message
-        # imu_msg = Imu()
-        # imu_msg.header.frame_id = 'base_link'
-        # imu_msg.header.stamp = self.get_clock().now().to_msg()
-        # # imu_msg.orientation = Quaternion(q[0], q[1], q[2], q[3])
-        # imu_msg.orientation = Quaternion()
-        # imu_msg.orientation.x = streamer.ix
-        # imu_msg.orientation.y = streamer.iy
-        # imu_msg.orientation.z = streamer.iz
-        # imu_msg.orientation.w = streamer.r
-        # imu_msg.orientation_covariance = [-1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
-        # imu_msg.angular_velocity.x = float(streamer.gyro.x)
-        # imu_msg.angular_velocity.y = float(streamer.gyro.y)
-        # imu_msg.angular_velocity.z = float(streamer.gyro.z)
-        # imu_msg.linear_acceleration.x = G*streamer.acceleration.x
-        # imu_msg.linear_acceleration.y = G*streamer.acceleration.y
-        # imu_msg.linear_acceleration.z = G*streamer.acceleration.z
+        imu_msg = Imu()
 
+        # Imu Header
+        imu_msg.header.frame_id = 'iphone_link'
+        imu_msg.header.stamp = self.get_clock().now().to_msg()
+
+        # Imu Orientation
+        # This is not in the imu frame currently.
+        imu_msg.orientation = Quaternion()
+        imu_msg.orientation.x = streamer.ix
+        imu_msg.orientation.y = streamer.iy
+        imu_msg.orientation.z = streamer.iz
+        imu_msg.orientation.w = streamer.r
+        imu_msg.orientation_covariance = [-1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+
+        # Imu Angular Velocity
+        """
+            See gyro iphone convention 
+            https://developer.apple.com/documentation/coremotion/getting_raw_gyroscope_events
+            iPhone Link must be changed in the urdf if this convention changes
+        """
+        imu_msg.angular_velocity.x = float(streamer.gyro.x)
+        imu_msg.angular_velocity.y = float(streamer.gyro.y)
+        imu_msg.angular_velocity.z = float(streamer.gyro.z)
+
+        # Imu Acceleration
+        """
+            See acc iphone convention 
+            https://developer.apple.com/documentation/coremotion/getting_raw_accelerometer_events
+            iPhone Link must be changed in the urdf if this convention changes
+        """
+        imu_msg.linear_acceleration.x = G*streamer.acceleration.x
+        imu_msg.linear_acceleration.y = G*streamer.acceleration.y
+        imu_msg.linear_acceleration.z = G*streamer.acceleration.z
+        
         ### Constructing Odom Message
         odom_msg = Odometry()
-        odom_msg.header.frame_id = "base_link"
-        odom_msg.child_frame_id = "odom"
+
+        # Odom Header
+        odom_msg.header.frame_id = 'odom_iphone'
+        odom_msg.child_frame_id = 'odom_iphone'
         odom_msg.header.stamp = self.get_clock().now().to_msg()
+
+        # Position and Orientation in header frame (odom)
         odom_msg.pose.pose.position.x = streamer.transform.location.x
         odom_msg.pose.pose.position.y = streamer.transform.location.y
         odom_msg.pose.pose.position.z = streamer.transform.location.z
@@ -141,30 +164,24 @@ class StateStreamer(Node):
         odom_msg.pose.pose.orientation.y = streamer.iy
         odom_msg.pose.pose.orientation.z = streamer.iz
         odom_msg.pose.pose.orientation.w = streamer.r
-        # odom_msg.twist.twist.linear.x = float(streamer.velocity.x)
-        # odom_msg.twist.twist.linear.y = float(streamer.velocity.y)
-        # odom_msg.twist.twist.linear.z = float(streamer.velocity.z)
-        # odom_msg.twist.twist.angular.x = float(streamer.gyro.x)
-        # odom_msg.twist.twist.angular.y = float(streamer.gyro.y)
-        # odom_msg.twist.twist.angular.z = float(streamer.gyro.z)
 
-        # ### construct transform information
-        t = TransformStamped()
-        t.header.stamp = self.get_clock().now().to_msg()
-        t.header.frame_id = "odom"
-        t.child_frame_id = "base_link"
+        # Velocity and Angular Velocity in child_frame (odom)
+        """
+            Right now the iphone computes the velocity and the angular velocity
+            in the odom frame. Please change child_frame_id to base_link if
+            these values are changed to being computed in the frame of the car.
+            If some other frame is used, make sure to add the frame to the urdf
+            package as well.
+        """
+        
+        odom_msg.twist.twist.linear.x = float(streamer.velocity.x)
+        odom_msg.twist.twist.linear.y = float(streamer.velocity.y)
+        odom_msg.twist.twist.linear.z = float(streamer.velocity.z)
+        odom_msg.twist.twist.angular.x = float(streamer.gyro.x)
+        odom_msg.twist.twist.angular.y = float(streamer.gyro.y)
+        odom_msg.twist.twist.angular.z = float(streamer.gyro.z)
 
-        t.transform.translation.x = streamer.transform.location.x
-        t.transform.translation.y = streamer.transform.location.y
-        t.transform.translation.z = streamer.transform.location.z
-
-        t.transform.rotation.x = streamer.ix
-        t.transform.rotation.y = streamer.iy
-        t.transform.rotation.z = streamer.iz
-        t.transform.rotation.w = streamer.r
-
-        self.transform_br.sendTransform(t)
-        # self.imu_pub.publish(imu_msg)
+        self.imu_pub.publish(imu_msg)
         self.odom_pub.publish(odom_msg)
 
         # self.get_logger().info('Publishing odom: "%s"' % odom_msg)

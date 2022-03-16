@@ -1,15 +1,8 @@
 #!/usr/bin/env python3
 
 config = {
-    "ip_address": "192.168.1.18",
+    "ip_address": "10.0.0.12",
     "G": 9.8,
     "query_rate": 0.02,
-
-    "max_forward_throttle": 0.2,
-    "max_reverse_throttle": -0.2,
-    "max_steering": 1.0,
-    "steering_offset": -0.2,
-    "invert_steering": False,
-    "pygame_display_width": 360,
-    "pygame_display_height": 720,
+    "buffer_length": 1,
 }
