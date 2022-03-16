@@ -85,7 +85,7 @@ class DepthStreamer(Node):
             # cv2.waitKey(1)
 
             depth_info_msg = CameraInfo()
-            depth_info_msg.header.frame_id = "base_link"
+            depth_info_msg.header.frame_id = "iphone_link"
             # depth_info_msg.header.seq = np.random.randint(0,10000000)
             depth_info_msg.height = 256
             depth_info_msg.width = 144
@@ -101,7 +101,7 @@ class DepthStreamer(Node):
             depth_info_msg.p = [fx, 0.0, cx, 0.0, 0.0, fy, cy, 0.0, 0.0, 0.0, 1.0, 0.0]
 
             depth_img_msg = bridge.cv2_to_imgmsg(img, encoding="passthrough")
-            depth_img_msg.header.frame_id = "base_link"
+            depth_img_msg.header.frame_id = "iphone_link"
             # Setting time of both info and image to get same timestamp on both
             depth_img_msg.header.stamp = depth_info_msg.header.stamp = (
                 self.get_clock().now().to_msg()

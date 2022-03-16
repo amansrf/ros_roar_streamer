@@ -86,7 +86,7 @@ class PointCloudPublisher(Node):
         # colors = np.floor(colors*255).astype(np.uint8) # nx3 matrix
         # colors = colors[:,0] * BIT_MOVE_16 +colors[:,1] * BIT_MOVE_8 + colors[:,2]
         pc2 = point_cloud(
-            points, parent_frame="base_link", stamp=self.get_clock().now().to_msg()
+            points, parent_frame="iphone_link", stamp=self.get_clock().now().to_msg()
         )
         self.point_cloud_pub.publish(pc2)
 
