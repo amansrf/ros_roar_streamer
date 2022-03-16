@@ -39,6 +39,7 @@ def generate_launch_description():
                         "robot_streamer.launch.py",
                     ),
                 ),
+                launch_arguments={"gui": "False"}.items(),
             ),
             Node(
                 package="ros_roar_streamer",
