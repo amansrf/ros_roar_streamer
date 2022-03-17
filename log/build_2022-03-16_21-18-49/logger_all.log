@@ -1,0 +1,97 @@
+[0.114s] DEBUG:colcon:Command line arguments: ['/usr/bin/colcon', 'build', '--symlink-install']
+[0.114s] DEBUG:colcon:Parsed command line arguments: Namespace(allow_overriding=[], ament_cmake_args=None, base_paths=['.'], build_base='build', catkin_cmake_args=None, catkin_skip_building_tests=False, cmake_args=None, cmake_clean_cache=False, cmake_clean_first=False, cmake_force_configure=False, cmake_target=None, cmake_target_skip_unavailable=False, continue_on_error=False, event_handlers=None, executor='parallel', ignore_user_meta=False, install_base='install', log_base=None, log_level=None, main=<bound method BuildVerb.main of <colcon_core.verb.build.BuildVerb object at 0x7f7a067452e0>>, merge_install=False, metas=['./colcon.meta'], packages_above=None, packages_above_and_dependencies=None, packages_above_depth=None, packages_end=None, packages_ignore=None, packages_ignore_regex=None, packages_select=None, packages_select_build_failed=False, packages_select_by_dep=None, packages_select_regex=None, packages_select_test_failures=False, packages_skip=None, packages_skip_build_finished=False, packages_skip_by_dep=None, packages_skip_regex=None, packages_skip_test_passed=False, packages_skip_up_to=None, packages_start=None, packages_up_to=None, packages_up_to_regex=None, parallel_workers=16, paths=None, symlink_install=True, test_result_base=None, verb_extension=<colcon_core.verb.build.BuildVerb object at 0x7f7a067452e0>, verb_name='build', verb_parser=<colcon_defaults.argument_parser.defaults.DefaultArgumentsDecorator object at 0x7f7a06745820>)
+[0.118s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) check parameters
+[0.118s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) check parameters
+[0.118s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) check parameters
+[0.118s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) check parameters
+[0.118s] Level 1:colcon.colcon_core.package_discovery:discover_packages(colcon_meta) discover
+[0.118s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) discover
+[0.118s] INFO:colcon.colcon_core.package_discovery:Crawling recursively for packages in '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer'
+[0.118s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ignore', 'ignore_ament_install']
+[0.118s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore'
+[0.118s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ignore_ament_install'
+[0.118s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_pkg']
+[0.118s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_pkg'
+[0.118s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['colcon_meta']
+[0.118s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'colcon_meta'
+[0.118s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extensions ['ros']
+[0.118s] Level 1:colcon.colcon_core.package_identification:_identify(.) by extension 'ros'
+[0.127s] DEBUG:colcon.colcon_core.package_identification:Package '.' with type 'ros.ament_python' and name 'ros_roar_streamer'
+[0.127s] Level 1:colcon.colcon_core.package_discovery:discover_packages(recursive) using defaults
+[0.127s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) discover
+[0.127s] Level 1:colcon.colcon_core.package_discovery:discover_packages(ignore) using defaults
+[0.127s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) discover
+[0.127s] Level 1:colcon.colcon_core.package_discovery:discover_packages(path) using defaults
+[0.142s] Level 5:colcon.colcon_core.verb:set package 'ros_roar_streamer' build argument 'cmake_args' from command line to 'None'
+[0.142s] Level 5:colcon.colcon_core.verb:set package 'ros_roar_streamer' build argument 'cmake_target' from command line to 'None'
+[0.142s] Level 5:colcon.colcon_core.verb:set package 'ros_roar_streamer' build argument 'cmake_target_skip_unavailable' from command line to 'False'
+[0.142s] Level 5:colcon.colcon_core.verb:set package 'ros_roar_streamer' build argument 'cmake_clean_cache' from command line to 'False'
+[0.142s] Level 5:colcon.colcon_core.verb:set package 'ros_roar_streamer' build argument 'cmake_clean_first' from command line to 'False'
+[0.142s] Level 5:colcon.colcon_core.verb:set package 'ros_roar_streamer' build argument 'cmake_force_configure' from command line to 'False'
+[0.142s] Level 5:colcon.colcon_core.verb:set package 'ros_roar_streamer' build argument 'ament_cmake_args' from command line to 'None'
+[0.142s] Level 5:colcon.colcon_core.verb:set package 'ros_roar_streamer' build argument 'catkin_cmake_args' from command line to 'None'
+[0.142s] Level 5:colcon.colcon_core.verb:set package 'ros_roar_streamer' build argument 'catkin_skip_building_tests' from command line to 'False'
+[0.142s] DEBUG:colcon.colcon_core.verb:Building package 'ros_roar_streamer' with the following arguments: {'ament_cmake_args': None, 'build_base': '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/build/ros_roar_streamer', 'catkin_cmake_args': None, 'catkin_skip_building_tests': False, 'cmake_args': None, 'cmake_clean_cache': False, 'cmake_clean_first': False, 'cmake_force_configure': False, 'cmake_target': None, 'cmake_target_skip_unavailable': False, 'install_base': '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer', 'merge_install': False, 'path': '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer', 'symlink_install': True, 'test_result_base': None}
+[0.149s] WARNING:colcon.colcon_core.verb:Some selected packages are already built in one or more underlay workspaces:
+	'ros_roar_streamer' is in: /home/roar/Desktop/projects/roar_ros/install/ros_roar_streamer
+If a package in a merged underlay workspace is overridden and it installs headers, then all packages in the overlay must sort their include directories by workspace order. Failure to do so may result in build failures or undefined behavior at run time.
+If the overridden package is used by another package in any underlay, then the overriding package in the overlay must be API and ABI compatible or undefined behavior at run time may occur.
+
+If you understand the risks and want to override a package anyways, add the following to the command line:
+	--allow-overriding ros_roar_streamer
+
+This may be promoted to an error in a future release of colcon-core.
+[0.150s] INFO:colcon.colcon_core.executor:Executing jobs using 'parallel' executor
+[0.151s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete
+[0.152s] INFO:colcon.colcon_ros.task.ament_python.build:Building ROS package in '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer' with build type 'ament_python'
+[0.152s] Level 1:colcon.colcon_core.shell:create_environment_hook('ros_roar_streamer', 'ament_prefix_path')
+[0.155s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_core.shell.bat': Not used on non-Windows systems
+[0.155s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer/share/ros_roar_streamer/hook/ament_prefix_path.ps1'
+[0.155s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer/share/ros_roar_streamer/hook/ament_prefix_path.dsv'
+[0.156s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer/share/ros_roar_streamer/hook/ament_prefix_path.sh'
+[0.156s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.156s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.413s] INFO:colcon.colcon_core.task.python.build:Building Python package in '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer'
+[0.414s] INFO:colcon.colcon_core.shell:Skip shell extension 'powershell' for command environment: Not usable outside of PowerShell
+[0.414s] DEBUG:colcon.colcon_core.shell:Skip shell extension 'dsv' for command environment
+[0.834s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoking command in '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/build/ros_roar_streamer': PYTHONPATH=/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer/lib/python3.8/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --prefix /home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer --editable --build-directory /home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/build/ros_roar_streamer/build --no-deps install_data --install-dir /home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer
+[1.297s] Level 1:colcon.colcon_core.shell:create_environment_hook('ros_roar_streamer', 'pythonpath_develop')
+[1.298s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/build/ros_roar_streamer/share/ros_roar_streamer/hook/pythonpath_develop.ps1'
+[1.299s] DEBUG:colcon.colcon_core.event_handler.log_command:Invoked command in '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/build/ros_roar_streamer' returned '0': PYTHONPATH=/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer/lib/python3.8/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --prefix /home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer --editable --build-directory /home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/build/ros_roar_streamer/build --no-deps install_data --install-dir /home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer
+[1.299s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/build/ros_roar_streamer/share/ros_roar_streamer/hook/pythonpath_develop.dsv'
+[1.300s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/build/ros_roar_streamer/share/ros_roar_streamer/hook/pythonpath_develop.sh'
+[1.305s] Level 1:colcon.colcon_core.environment:checking '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer' for CMake module files
+[1.306s] Level 1:colcon.colcon_core.environment:checking '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer' for CMake config files
+[1.307s] Level 1:colcon.colcon_core.environment:checking '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer/lib'
+[1.307s] Level 1:colcon.colcon_core.environment:checking '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer/bin'
+[1.307s] Level 1:colcon.colcon_core.environment:checking '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer/lib/pkgconfig/ros_roar_streamer.pc'
+[1.307s] Level 1:colcon.colcon_core.environment:checking '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer/lib/python3.8/site-packages'
+[1.307s] Level 1:colcon.colcon_core.shell:create_environment_hook('ros_roar_streamer', 'pythonpath')
+[1.308s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer/share/ros_roar_streamer/hook/pythonpath.ps1'
+[1.308s] INFO:colcon.colcon_core.shell:Creating environment descriptor '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer/share/ros_roar_streamer/hook/pythonpath.dsv'
+[1.308s] INFO:colcon.colcon_core.shell:Creating environment hook '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer/share/ros_roar_streamer/hook/pythonpath.sh'
+[1.308s] Level 1:colcon.colcon_core.environment:create_environment_scripts_only(ros_roar_streamer)
+[1.309s] INFO:colcon.colcon_core.shell:Creating package script '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer/share/ros_roar_streamer/package.ps1'
+[1.309s] INFO:colcon.colcon_core.shell:Creating package descriptor '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer/share/ros_roar_streamer/package.dsv'
+[1.310s] INFO:colcon.colcon_core.shell:Creating package script '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer/share/ros_roar_streamer/package.sh'
+[1.310s] INFO:colcon.colcon_core.shell:Creating package script '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer/share/ros_roar_streamer/package.bash'
+[1.311s] INFO:colcon.colcon_core.shell:Creating package script '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer/share/ros_roar_streamer/package.zsh'
+[1.311s] Level 1:colcon.colcon_core.environment:create_file_with_runtime_dependencies(/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer/share/colcon-core/packages/ros_roar_streamer)
+[1.311s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:closing loop
+[1.312s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:loop closed
+[1.312s] DEBUG:colcon.colcon_parallel_executor.executor.parallel:run_until_complete finished with '0'
+[1.312s] DEBUG:colcon.colcon_core.event_reactor:joining thread
+[1.327s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.terminal_notifier': Not used on non-Darwin systems
+[1.327s] INFO:colcon.colcon_core.plugin_system:Skipping extension 'colcon_notification.desktop_notification.win32': Not used on non-Windows systems
+[1.327s] INFO:colcon.colcon_notification.desktop_notification:Sending desktop notification using 'notify2'
+[1.342s] DEBUG:colcon.colcon_core.event_reactor:joined thread
+[1.342s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/local_setup.ps1'
+[1.344s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/_local_setup_util_ps1.py'
+[1.345s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/setup.ps1'
+[1.347s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/local_setup.sh'
+[1.348s] INFO:colcon.colcon_core.shell:Creating prefix util module '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/_local_setup_util_sh.py'
+[1.348s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/setup.sh'
+[1.350s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/local_setup.bash'
+[1.350s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/setup.bash'
+[1.352s] INFO:colcon.colcon_core.shell:Creating prefix script '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/local_setup.zsh'
+[1.353s] INFO:colcon.colcon_core.shell:Creating prefix chain script '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/setup.zsh'

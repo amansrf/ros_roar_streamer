@@ -4,6 +4,7 @@ from launch_ros.actions import Node
 import os
 from ament_index_python.packages import get_package_share_directory
 import launch
+import launch_ros
 
 
 def generate_launch_description():
@@ -104,6 +105,30 @@ def generate_launch_description():
                 executable="rviz2",
                 name="rviz2",
                 arguments=["-d", str(rviz_path)],
+            ),
+            launch_ros.actions.ComposableNodeContainer(
+                name="container",
+                namespace="",
+                package="rclcpp_components",
+                executable="component_container",
+                composable_node_descriptions=[
+                    # Driver itself
+                    launch_ros.descriptions.ComposableNode(
+                        package="depth_image_proc",
+                        plugin="depth_image_proc::PointCloudXyzrgbNode",
+                        name="point_cloud_xyzrgb_node",
+                        remappings=[
+                            ("rgb/camera_info", "/depth_streamer/camera_info"),
+                            ("rgb/image_rect_color", "/rgb_streamer/rgb_image"),
+                            (
+                                "depth_registered/image_rect",
+                                "/depth_streamer/depth_image",
+                            ),
+                            ("points", "/pointcloud"),
+                        ],
+                    ),
+                ],
+                output="screen",
             ),
         ]
     )

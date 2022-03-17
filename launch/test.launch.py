@@ -115,13 +115,16 @@ def generate_launch_description():
                     # Driver itself
                     launch_ros.descriptions.ComposableNode(
                         package="depth_image_proc",
-                        plugin="depth_image_proc::PointCloudXyzNode",
-                        name="point_cloud_xyz_node",
+                        plugin="depth_image_proc::PointCloudXyzrgbNode",
+                        name="point_cloud_xyzrgb_node",
                         remappings=[
-                            ("/image_rect", "/depth_streamer/depth_image"),
-                            ("/camera_info", "/depth_streamer/camera_info"),
-                            ("/image_raw", "/depth_streamer/depth_image"),
-                            ("/image_mono", "/depth_streamer/depth_image"),
+                            ("rgb/camera_info", "/depth_streamer/camera_info"),
+                            ("rgb/image_rect_color", "/rgb_streamer/rgb_image"),
+                            (
+                                "depth_registered/image_rect",
+                                "/depth_streamer/depth_image",
+                            ),
+                            ("points", "/pointcloud"),
                         ],
                     ),
                 ],

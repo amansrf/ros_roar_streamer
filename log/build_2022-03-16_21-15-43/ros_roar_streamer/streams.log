@@ -1,0 +1,23 @@
+[0.664s] Invoking command in '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/build/ros_roar_streamer': PYTHONPATH=/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer/lib/python3.8/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --prefix /home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer --editable --build-directory /home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/build/ros_roar_streamer/build --no-deps install_data --install-dir /home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer
+[0.913s] running develop
+[1.047s] running egg_info
+[1.047s] writing ros_roar_streamer.egg-info/PKG-INFO
+[1.047s] writing dependency_links to ros_roar_streamer.egg-info/dependency_links.txt
+[1.047s] writing entry points to ros_roar_streamer.egg-info/entry_points.txt
+[1.047s] writing requirements to ros_roar_streamer.egg-info/requires.txt
+[1.047s] writing top-level names to ros_roar_streamer.egg-info/top_level.txt
+[1.072s] reading manifest file 'ros_roar_streamer.egg-info/SOURCES.txt'
+[1.072s] writing manifest file 'ros_roar_streamer.egg-info/SOURCES.txt'
+[1.106s] running build_ext
+[1.106s] Creating /home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer/lib/python3.8/site-packages/ros-roar-streamer.egg-link (link to .)
+[1.106s] Installing control_streamer script to /home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer/lib/ros_roar_streamer
+[1.107s] Installing depth_streamer script to /home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer/lib/ros_roar_streamer
+[1.107s] Installing manual_drive_with_pygame script to /home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer/lib/ros_roar_streamer
+[1.107s] Installing pointcloud_publisher script to /home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer/lib/ros_roar_streamer
+[1.107s] Installing rgb_streamer script to /home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer/lib/ros_roar_streamer
+[1.107s] Installing state_streamer script to /home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer/lib/ros_roar_streamer
+[1.107s] 
+[1.107s] Installed /home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/build/ros_roar_streamer
+[1.107s] running install_data
+[1.107s] copying launch/test.launch.py -> /home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer/share/ros_roar_streamer
+[1.127s] Invoked command in '/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/build/ros_roar_streamer' returned '0': PYTHONPATH=/home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer/lib/python3.8/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py develop --prefix /home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer --editable --build-directory /home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/build/ros_roar_streamer/build --no-deps install_data --install-dir /home/roar/Desktop/projects/roar_ros/src/ros_roar_streamer/install/ros_roar_streamer
