@@ -3,7 +3,9 @@ Panels:
     Help Height: 78
     Name: Displays
     Property Tree Widget:
-      Expanded: ~
+      Expanded:
+        - /Global Options1
+        - /PointCloud21
       Splitter Ratio: 0.5
     Tree Height: 369
   - Class: rviz_common/Selection
@@ -77,6 +79,8 @@ Visualization Manager:
           Value: false
         base_link:
           Value: true
+        depth_link:
+          Value: true
         drivewhl_front_l_link:
           Value: false
         drivewhl_front_r_link:
@@ -93,6 +97,8 @@ Visualization Manager:
           Value: false
         odom_iphone:
           Value: true
+        rgb_link:
+          Value: true
       Marker Scale: 1
       Name: TF
       Show Arrows: true
@@ -102,6 +108,8 @@ Visualization Manager:
         odom:
           odom_iphone:
             iphone_link:
+              depth_link:
+                {}
               iphone_mount_link:
                 base_link:
                   base_footprint:
@@ -114,6 +122,8 @@ Visualization Manager:
                     {}
                   drivewhl_rear_r_link:
                     {}
+              rgb_link:
+                {}
       Update Interval: 0
       Value: true
     - Alpha: 1
@@ -145,7 +155,7 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /pointcloud
+        Value: /pointcloud_publisher/pointcloud
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
@@ -176,6 +186,10 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        depth_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
         drivewhl_front_l_link:
           Alpha: 1
           Show Axes: false
@@ -205,6 +219,10 @@ Visualization Manager:
           Alpha: 1
           Show Axes: false
           Show Trail: false
+        rgb_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
       Name: RobotModel
       TF Prefix: ""
       Update Interval: 0
@@ -213,7 +231,7 @@ Visualization Manager:
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
-    Fixed Frame: odom_iphone
+    Fixed Frame: odom
     Frame Rate: 30
   Name: root
   Tools:
@@ -253,7 +271,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 5.3110880851745605
+      Distance: 5.493842124938965
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -268,10 +286,10 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.03479680418968201
+      Pitch: 0.41020384430885315
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 2.901747941970825
+      Yaw: 2.7249271869659424
     Saved: ~
 Window Geometry:
   Displays:

@@ -83,9 +83,9 @@ class RGBStreamer(Node):
         if ir_image_server.curr_image is not None:
             img = ir_image_server.curr_image
             img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
-
+            img = cv2.resize(img, dsize=(144,256))
             rgb_info_msg = CameraInfo()
-            rgb_info_msg.header.frame_id = "iphone_link"
+            rgb_info_msg.header.frame_id = "rgb_link"
             # rgb_info_msg.header.seq = np.random.randint(0,10000000)
             rgb_info_msg.height = 256
             rgb_info_msg.width = 144
@@ -104,7 +104,7 @@ class RGBStreamer(Node):
             rgb_info_msg.header.stamp = rgb_img_msg.header.stamp = (
                 self.get_clock().now().to_msg()
             )
-            rgb_img_msg.header.frame_id = "iphone_link"
+            rgb_img_msg.header.frame_id = "rgb_link"
 
             self.rgb_image_pub.publish(rgb_img_msg)
             self.rgb_info_pub.publish(rgb_info_msg)

@@ -18,6 +18,29 @@ def generate_launch_description():
             launch.actions.DeclareLaunchArgument(
                 name="ios_ip_address", default_value="127.0.0.1"
             ),
+            launch.actions.IncludeLaunchDescription(
+                launch.launch_description_sources.PythonLaunchDescriptionSource(
+                    os.path.join(
+                        os.path.join(
+                            get_package_share_directory("roar_transforms"),
+                            "launch",
+                        ),
+                        "roar_tf.launch.py",
+                    ),
+                ),
+            ),
+            launch.actions.IncludeLaunchDescription(
+                launch.launch_description_sources.PythonLaunchDescriptionSource(
+                    os.path.join(
+                        os.path.join(
+                            get_package_share_directory("roar_bot_description"),
+                            "launch",
+                        ),
+                        "robot_streamer.launch.py",
+                    ),
+                ),
+                launch_arguments={"gui": "False"}.items(),
+            ),
             Node(
                 package="ros_roar_streamer",
                 namespace="depth_streamer",
@@ -59,12 +82,6 @@ def generate_launch_description():
             ),
             Node(
                 package="ros_roar_streamer",
-                namespace="pointcloud_publisher",
-                executable="pointcloud_publisher",
-                name="pointcloud_publisher",
-            ),
-            Node(
-                package="ros_roar_streamer",
                 namespace="state_streamer",
                 executable="state_streamer",
                 name="state_streamer",
@@ -75,6 +92,12 @@ def generate_launch_description():
                         )
                     },
                 ],
+            ),
+            Node(
+                package="ros_roar_streamer",
+                namespace="pointcloud_publisher",
+                executable="pointcloud_publisher",
+                name="pointcloud_publisher",
             ),
         ]
     )
