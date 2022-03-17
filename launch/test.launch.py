@@ -1,10 +1,10 @@
 from sympy import im
 from launch import LaunchDescription
 from launch_ros.actions import Node
-import launch_ros.actions
 import os
 from ament_index_python.packages import get_package_share_directory
 import launch
+import launch_ros
 
 
 def generate_launch_description():
@@ -105,6 +105,27 @@ def generate_launch_description():
                 executable="rviz2",
                 name="rviz2",
                 arguments=["-d", str(rviz_path)],
+            ),
+            launch_ros.actions.ComposableNodeContainer(
+                name="container",
+                namespace="",
+                package="rclcpp_components",
+                executable="component_container",
+                composable_node_descriptions=[
+                    # Driver itself
+                    launch_ros.descriptions.ComposableNode(
+                        package="depth_image_proc",
+                        plugin="depth_image_proc::PointCloudXyzNode",
+                        name="point_cloud_xyz_node",
+                        remappings=[
+                            ("/image_rect", "/depth_streamer/depth_image"),
+                            ("/camera_info", "/depth_streamer/camera_info"),
+                            ("/image_raw", "/depth_streamer/depth_image"),
+                            ("/image_mono", "/depth_streamer/depth_image"),
+                        ],
+                    ),
+                ],
+                output="screen",
             ),
         ]
     )
