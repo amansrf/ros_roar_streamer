@@ -31,9 +31,6 @@ def generate_launch_description():
             launch.actions.DeclareLaunchArgument(
                 name="steering_offset", default_value="0.0"
             ),
-            launch.actions.DeclareLaunchArgument(
-                name="ios_ip_address", default_value="127.0.0.1"
-            ),
             launch.actions.IncludeLaunchDescription(
                 launch.launch_description_sources.PythonLaunchDescriptionSource(
                     os.path.join(
@@ -132,12 +129,6 @@ def generate_launch_description():
                     ),
                 ],
                 output="screen",
-            ),
-            Node(
-                package="rviz2",
-                executable="rviz2",
-                name="rviz2",
-                arguments=["-d", str(rviz_path)],
             ),
             Node(
                 package="ros_roar_streamer",

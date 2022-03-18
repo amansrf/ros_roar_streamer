@@ -94,12 +94,12 @@ def generate_launch_description():
                     },
                 ],
             ),
-            Node(
-                package="ros_roar_streamer",
-                namespace="pointcloud_publisher",
-                executable="pointcloud_publisher",
-                name="pointcloud_publisher",
-            ),
+            # Node(
+            #     package="ros_roar_streamer",
+            #     namespace="pointcloud_publisher",
+            #     executable="pointcloud_publisher",
+            #     name="pointcloud_publisher",
+            # ),
             launch_ros.actions.ComposableNodeContainer(
                 name="container",
                 namespace="",

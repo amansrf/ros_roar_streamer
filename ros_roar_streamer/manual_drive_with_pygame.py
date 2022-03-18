@@ -9,7 +9,6 @@ from cv_bridge import CvBridge
 import cv2
 from pygame import *
 import sys
-from . import config as cfg
 import logging
 from carla_msgs.msg import CarlaEgoVehicleControl
 
@@ -38,9 +37,17 @@ class ManualDriveWithPyGame(Node):
         self.steering_offset = (
             self.get_parameter("steering_offset").get_parameter_value().double_value
         )
+        self.get_logger().info(
+            f"NOTE: max_forward_throttle = {self.max_forward_throttle}"
+        )
+        self.get_logger().info(
+            f"NOTE: max_reverse_throttle = {self.max_reverse_throttle}"
+        )
+        self.get_logger().info(f"NOTE: max_steering = {self.max_steering}")
+        self.get_logger().info(f"NOTE: steering_offset = {self.steering_offset}")
 
-        self.pygame_display_width = cfg.config["pygame_display_width"]
-        self.pygame_display_height = cfg.config["pygame_display_height"]
+        self.pygame_display_width = 800
+        self.pygame_display_height = 600
         self.subscription = self.create_subscription(
             msg_type=Image,
             topic="/rgb_streamer/rgb_image",
@@ -58,7 +65,12 @@ class ManualDriveWithPyGame(Node):
         self.clock = pygame.time.Clock()
         self.setup_pygame()
         self.timer = self.create_timer(0.05, self.pygame_keyboard_callback)
-        self.manual_controller = ManualControl()
+        self.manual_controller = ManualControl(
+            max_steering=self.max_steering,
+            max_forward_throttle=self.max_forward_throttle,
+            max_reverse_throttle=self.max_reverse_throttle,
+            steering_offset=self.steering_offset,
+        )
 
     def pygame_keyboard_callback(self):
         should_continue, control, _ = self.manual_controller.parse_events(
@@ -71,7 +83,12 @@ class ManualDriveWithPyGame(Node):
             rclpy.try_shutdown()
 
         else:
-            control = CarlaEgoVehicleControl(throttle=control[0], steer=control[1])
+            control = CarlaEgoVehicleControl(
+                throttle=np.clip(
+                    control[0], self.max_reverse_throttle, self.max_forward_throttle
+                ),
+                steer=np.clip(control[1], -self.max_steering, self.max_steering),
+            )
             self.carla_msg_publisher.publish(control)
 
     def setup_pygame(self):
