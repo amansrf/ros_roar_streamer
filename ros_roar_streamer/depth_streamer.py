@@ -5,11 +5,11 @@ from rclpy.node import Node
 
 from sensor_msgs.msg import Image
 from sensor_msgs.msg import CameraInfo
+import cv2
 from cv_bridge import CvBridge
 
 from typing import List, Optional, Tuple, List
 import numpy as np
-import cv2
 import sys, os
 from pathlib import Path
 
