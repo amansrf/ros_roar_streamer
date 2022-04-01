@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
 
+
+from sympy import im
 import rclpy
 from rclpy.node import Node
 
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import Imu
 from tf_transformations import quaternion_from_euler
+from geometry_msgs.msg import TransformStamped
+from tf2_ros import TransformBroadcaster
+import tf_transformations
+
 from geometry_msgs.msg import Quaternion
 from geometry_msgs.msg import Vector3
 
@@ -18,13 +24,14 @@ import time
 from . import config as cfg
 
 sys.path.append(Path(os.getcwd()).parent.as_posix())
-from . udp_receiver import UDPStreamer
-from . data_structures_models import Transform, Vector3D
+from .udp_receiver import UDPStreamer
+from .data_structures_models import Transform, Vector3D
 
 G = cfg.config["G"]
 ip = cfg.config["ip_address"]
 PUB_RATE = cfg.config["query_rate"]
 BUFFER_LENGTH = cfg.config["buffer_length"]
+
 
 class VehicleStateStreamer(UDPStreamer):
     def __init__(self, **kwargs):
@@ -44,7 +51,7 @@ class VehicleStateStreamer(UDPStreamer):
             data = self.recv()
             if data is None:
                 return
-            d = [float(s) for s in data.decode('utf-8').split(",")]
+            d = [float(s) for s in data.decode("utf-8").split(",")]
             # d = np.frombuffer(data, dtype=np.float32)
             self.transform.location.x = d[0]
             self.transform.location.y = d[1]
@@ -75,22 +82,27 @@ class VehicleStateStreamer(UDPStreamer):
         except Exception as e:
             self.logger.error(e)
 
+
 class StateStreamer(Node):
-
     def __init__(self):
-        super().__init__('state_streamer')
-        
-        # TODO: The streamer update_interval and the timer_period for the callback
-        #       are set aribitrarily for now. This must be fixed to some optimal 
-        #       value to improve latency and prevent sync issues.
+        super().__init__("state_streamer")
 
-        self.streamer = VehicleStateStreamer(ios_address=ip,
-                                    port=8003,
-                                    name="VehicleStateStreamer",
-                                    update_interval=0.025,
-                                    threaded=True)
-        self.imu_pub = self.create_publisher(Imu, 'iPhone_imu', BUFFER_LENGTH)
-        self.odom_pub = self.create_publisher(Odometry, 'iPhone_odom', BUFFER_LENGTH)
+        # TODO: The streamer update_interval and the timer_period for the callback
+        #       are set aribitrarily for now. This must be fixed to some optimal
+        #       value to improve latency and prevent sync issues.
+        self.declare_parameter("ios_ip_address", "127.0.0.1")
+        self.ios_ip_address = (
+            self.get_parameter("ios_ip_address").get_parameter_value().string_value
+        )
+        self.streamer = VehicleStateStreamer(
+            ios_address=self.ios_ip_address,
+            port=8003,
+            name="VehicleStateStreamer",
+            update_interval=0.025,
+            threaded=True,
+        )
+        self.imu_pub = self.create_publisher(Imu, "/iPhone_imu", BUFFER_LENGTH)
+        self.odom_pub = self.create_publisher(Odometry, "/iPhone_odom", BUFFER_LENGTH)
 
         timer_period = cfg.config["query_rate"]  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
@@ -100,13 +112,14 @@ class StateStreamer(Node):
         streamer.run_in_series()
 
         ### DEBUG ONLY
-        print(self.streamer.transform, streamer.velocity)
-        
+
+        # self.get_logger().info(f"{self.streamer.transform}, {streamer.velocity}")
+
         ### Constructing Imu Message
         imu_msg = Imu()
 
         # Imu Header
-        imu_msg.header.frame_id = 'iphone_link'
+        imu_msg.header.frame_id = "iphone_link"
         imu_msg.header.stamp = self.get_clock().now().to_msg()
 
         # Imu Orientation
@@ -116,7 +129,7 @@ class StateStreamer(Node):
         imu_msg.orientation.y = streamer.iy
         imu_msg.orientation.z = streamer.iz
         imu_msg.orientation.w = streamer.r
-        imu_msg.orientation_covariance = [-1.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+        imu_msg.orientation_covariance = [-1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
         # Imu Angular Velocity
         """
@@ -134,16 +147,16 @@ class StateStreamer(Node):
             https://developer.apple.com/documentation/coremotion/getting_raw_accelerometer_events
             iPhone Link must be changed in the urdf if this convention changes
         """
-        imu_msg.linear_acceleration.x = G*streamer.acceleration.x
-        imu_msg.linear_acceleration.y = G*streamer.acceleration.y
-        imu_msg.linear_acceleration.z = G*streamer.acceleration.z
-        
+        imu_msg.linear_acceleration.x = G * streamer.acceleration.x
+        imu_msg.linear_acceleration.y = G * streamer.acceleration.y
+        imu_msg.linear_acceleration.z = G * streamer.acceleration.z
+
         ### Constructing Odom Message
         odom_msg = Odometry()
 
         # Odom Header
-        odom_msg.header.frame_id = 'odom_iphone'
-        odom_msg.child_frame_id = 'odom_iphone'
+        odom_msg.header.frame_id = "odom_iphone"
+        odom_msg.child_frame_id = "odom_iphone"
         odom_msg.header.stamp = self.get_clock().now().to_msg()
 
         # Position and Orientation in header frame (odom)
@@ -164,7 +177,7 @@ class StateStreamer(Node):
             If some other frame is used, make sure to add the frame to the urdf
             package as well.
         """
-        
+
         odom_msg.twist.twist.linear.x = float(streamer.velocity.x)
         odom_msg.twist.twist.linear.y = float(streamer.velocity.y)
         odom_msg.twist.twist.linear.z = float(streamer.velocity.z)
@@ -178,16 +191,19 @@ class StateStreamer(Node):
         # self.get_logger().info('Publishing odom: "%s"' % odom_msg)
         # self.get_logger().info('Publishing imu: "%s"' % imu_msg)
 
+
 def main(args=None):
     rclpy.init(args=args)
 
     state_streamer = StateStreamer()
-
-    rclpy.spin(state_streamer)
+    try:
+        rclpy.spin(state_streamer)
+    except KeyboardInterrupt:
+        pass
 
     state_streamer.destroy_node()
     rclpy.shutdown()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
