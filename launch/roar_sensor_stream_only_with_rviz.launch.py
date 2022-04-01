@@ -17,7 +17,7 @@ def generate_launch_description():
     return LaunchDescription(
         [
             launch.actions.DeclareLaunchArgument(
-                name="ios_ip_address", default_value="127.0.0.1"
+                name="ios_ip_address", default_value="127.0.0.1",
             ),
             launch.actions.IncludeLaunchDescription(
                 launch.launch_description_sources.PythonLaunchDescriptionSource(
