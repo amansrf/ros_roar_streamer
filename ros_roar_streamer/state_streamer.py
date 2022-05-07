@@ -16,6 +16,8 @@ from geometry_msgs.msg import Quaternion
 from geometry_msgs.msg import Vector3
 
 from std_msgs.msg import String
+from std_msgs.msg import Float32
+from std_msgs.msg import Header
 
 import numpy as np
 import sys, os
@@ -79,6 +81,9 @@ class VehicleStateStreamer(UDPStreamer):
             self.iz = d[19]
             self.r = d[20]
 
+            # Event
+            self.event = d[21]
+
         except Exception as e:
             self.logger.error(e)
 
@@ -103,6 +108,9 @@ class StateStreamer(Node):
         )
         self.imu_pub = self.create_publisher(Imu, "/iPhone_imu", BUFFER_LENGTH)
         self.odom_pub = self.create_publisher(Odometry, "/iPhone_odom", BUFFER_LENGTH)
+
+        self.event_pub = self.create_publisher(Header, "/state_streamer/event", BUFFER_LENGTH)
+        self.event_pub2 = self.create_publisher(Float32, "/state_streamer/event2", BUFFER_LENGTH)
 
         timer_period = cfg.config["query_rate"]  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
@@ -190,6 +198,16 @@ class StateStreamer(Node):
 
         # self.get_logger().info('Publishing odom: "%s"' % odom_msg)
         # self.get_logger().info('Publishing imu: "%s"' % imu_msg)
+
+        event_msg = Header()
+        event_msg.frame_id = str(streamer.event)
+        event_msg.stamp = self.get_clock().now().to_msg()
+
+        event_msg2 = Float32()
+        event_msg2.data = (streamer.event)
+
+        self.event_pub.publish(event_msg)
+        self.event_pub2.publish(event_msg2)
 
 
 def main(args=None):
